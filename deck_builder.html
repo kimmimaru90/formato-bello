@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Formato Bello — Deck Builder</title>
+<!--
+  Formato Bello — Deck Builder (v0.3, 2026-11-11)
+  Regole e Lista Punti dal regolamento del Formato Bello v0.4: se il
+  regolamento cambia, aggiornare la sezione RULES qui sotto.
+  Dati, immagini e simboli di mana: API pubblica di Scryfall (serve Internet).
+  Non affiliato a Wizards of the Coast né a Scryfall.
+  Lo stato del mazzo resta solo nel browser di chi lo usa (localStorage).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-1: #0a1422; --bg-2: #142b46; --bg-3: #102333;
+  --panel: rgba(22, 42, 60, .82); --panel-solid: #162a3c; --input: #0f2131;
+  --line: #24425c; --line-strong: #31597a;
+  --ink: #eaf3fb; --muted: #8fa9c2;
+  --yellow: #f2b705; --yellow-soft: #ffd75a; --blue: #1266ff;
+  --teal: #2cccc4; --cyan: #82e7ff; --aqua: #8fe7e1;
+  --ok: #3ddc97; --warn: #f2b705; --bad: #ff6b6b;
+  --radius: 10px;
+  --shadow: 0 8px 28px rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+html { background: var(--bg-1); }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink);
+  font: 15px/1.5 "Segoe UI", system-ui, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(44, 204, 196, .16), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(18, 102, 255, .18), transparent 60%),
+    linear-gradient(160deg, var(--bg-2) 0%, var(--bg-3) 45%, var(--bg-1) 100%);
+  background-attachment: fixed;
+}
+a { color: var(--cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+header.top {
+  position: sticky; top: 0; z-index: 5; padding: 14px 16px;
+  background: rgba(10, 20, 34, .78); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.top-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { font-family: "Cinzel", Georgia, serif; font-size: 22px; letter-spacing: .04em; margin: 0;
+  background: linear-gradient(90deg, var(--yellow-soft), var(--yellow) 40%, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.brand small { display: block; font-family: "Segoe UI", sans-serif; font-size: 12px; letter-spacing: 0;
+  color: var(--muted); -webkit-text-fill-color: var(--muted); }
+.steps { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.steps button { border: 1px solid var(--line); background: rgba(15, 33, 49, .8); color: var(--muted);
+  padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px; }
+.steps button:hover:not(:disabled) { border-color: var(--teal); color: var(--ink); }
+.steps button.on { background: var(--yellow); color: #1a1300; border-color: var(--yellow); font-weight: 600; }
+.steps button.done { color: var(--aqua); border-color: rgba(44, 204, 196, .45); }
+.steps button:disabled { opacity: .35; cursor: default; }
+main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; margin-bottom: 18px; box-shadow: var(--shadow); backdrop-filter: blur(6px); }
+.ptitle { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.ptitle h2 { margin: 0; font-size: 19px; font-family: "Cinzel", Georgia, serif; letter-spacing: .03em; }
+.ptitle .count { color: var(--yellow); font-weight: 700; font-family: "Segoe UI", sans-serif; }
+.info { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line-strong);
+  background: transparent; color: var(--cyan); font: italic 700 13px Georgia, serif; cursor: pointer; padding: 0; flex: none; }
+.info[aria-expanded="true"] { background: var(--cyan); color: var(--bg-1); }
+.help { display: none; margin: -4px 0 14px; padding: 10px 12px; border-radius: 8px; font-size: 13px;
+  color: var(--ink); background: rgba(130, 231, 255, .08); border: 1px solid rgba(130, 231, 255, .25); }
+.help.on { display: block; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { border: 1px solid var(--yellow); background: var(--yellow); color: #1a1300; font-weight: 600;
+  padding: 9px 16px; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 600; }
+.btn:hover:not(:disabled) { background: var(--yellow-soft); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); font-weight: 500; }
+.btn.ghost:hover:not(:disabled) { border-color: var(--teal); background: rgba(44, 204, 196, .08); }
+.btn.danger { background: transparent; color: var(--bad); border-color: rgba(255, 107, 107, .5); font-weight: 500; }
+.btn:disabled { opacity: .4; cursor: default; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+input[type=text] { font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line-strong);
+  background: var(--input); color: var(--ink); }
+input[type=text]::placeholder { color: #6f8aa5; }
+.colors { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.color { border: 1px solid var(--line); border-radius: 14px; padding: 18px 8px 14px; text-align: center;
+  cursor: pointer; background: rgba(15, 33, 49, .7); color: var(--ink); font: inherit; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.color:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+.color img { width: 64px; height: 64px; display: block; margin: 0 auto 10px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+.color.on { border-color: var(--glow); box-shadow: 0 0 0 1px var(--glow), 0 0 26px -4px var(--glow); }
+.color span { font-weight: 600; letter-spacing: .02em; }
+.slots, .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.slot { aspect-ratio: 63 / 88; border-radius: 12px; background: rgba(15, 33, 49, .55);
+  border: 2px dashed var(--line-strong); display: grid; place-items: center; cursor: pointer;
+  position: relative; overflow: hidden; color: var(--teal); font-size: 44px; font-weight: 300; padding: 0;
+  transition: border-color .15s, background .15s; }
+.slot:hover:not(.filled) { border-color: var(--teal); background: rgba(44, 204, 196, .08); }
+.slot.filled { border: 0; cursor: default; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+.slot img, .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0;
+  background: rgba(10, 20, 34, .85); color: #fff; cursor: pointer; font-size: 16px; line-height: 28px; padding: 0; }
+.x:hover { background: var(--bad); }
+.card { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; padding: 0;
+  border: 0; background: rgba(15, 33, 49, .55); aspect-ratio: 63 / 88; box-shadow: 0 6px 18px rgba(0,0,0,.45);
+  transition: transform .15s, box-shadow .15s; }
+.card:hover:not(.dis) { transform: translateY(-4px); box-shadow: 0 0 0 2px var(--yellow), 0 12px 26px rgba(0,0,0,.55); }
+.card.dis { opacity: .35; cursor: not-allowed; }
+.tag { position: absolute; left: 6px; bottom: 6px; right: 6px; background: rgba(10, 20, 34, .88);
+  color: var(--ink); font-size: 11px; padding: 4px 7px; border-radius: 6px; text-align: left; line-height: 1.3; }
+.tag b { color: var(--yellow); font-weight: 600; }
+.noimg { display: grid; place-items: center; height: 100%; padding: 8px; text-align: center; font-size: 13px; }
+.pack { display: grid; grid-template-columns: repeat(3, minmax(0, 270px)); gap: 20px; justify-content: center; margin: 6px 0 4px; }
+.status { font-size: 13px; color: var(--muted); min-height: 20px; margin: 4px 0 10px; }
+.modal-bg { position: fixed; inset: 0; background: rgba(4, 10, 18, .72); backdrop-filter: blur(4px); display: none;
+  align-items: flex-start; justify-content: center; padding: 24px 12px; z-index: 10; overflow-y: auto; }
+.modal-bg.on { display: flex; }
+.modal { background: var(--panel-solid); border-radius: 16px; width: min(1040px, 100%); padding: 18px;
+  border: 1px solid var(--line-strong); box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.modal .mhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.modal h2 { margin: 0; font-size: 19px; font-family: "Cinzel", Georgia, serif; }
+.list { width: 100%; border-collapse: collapse; font-size: 14px; }
+.list th, .list td { text-align: left; padding: 7px 8px; border-bottom: 1px solid rgba(36, 66, 92, .7); vertical-align: middle; }
+.list thead th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.list tr.group th { padding-top: 16px; color: var(--aqua); font-family: "Cinzel", Georgia, serif; font-size: 15px; border-bottom-color: var(--line-strong); }
+.list tbody tr:not(.group):hover { background: rgba(130, 231, 255, .05); }
+.list td.n { width: 96px; white-space: nowrap; }
+.list .it { display: block; color: var(--muted); font-size: 12px; }
+.mini { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--line-strong);
+  background: var(--input); color: var(--ink); cursor: pointer; padding: 0; }
+.mini:hover:not(:disabled) { border-color: var(--teal); }
+.mini:disabled { opacity: .3; cursor: default; }
+.ms { width: 16px; height: 16px; vertical-align: -3px; margin-right: 1px; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px;
+  border: 1px solid var(--line-strong); color: var(--muted); margin: 1px 4px 1px 0; }
+.pill.bomb { border-color: rgba(242, 183, 5, .6); color: var(--yellow); }
+.pill.pts { border-color: rgba(130, 231, 255, .5); color: var(--cyan); }
+.pill.bad { border-color: rgba(255, 107, 107, .6); color: var(--bad); }
+.checks { list-style: none; padding: 0; margin: 0; }
+.checks li { margin: 5px 0; }
+.ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+.summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { background: rgba(15, 33, 49, .7); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.stat b { display: block; font-size: 24px; line-height: 1.2; }
+.stat span { color: var(--muted); font-size: 12px; }
+.preview { position: fixed; pointer-events: none; z-index: 30; display: none; gap: 10px; }
+.preview img { width: min(300px, 44vw); border-radius: 15px; box-shadow: 0 10px 34px rgba(0,0,0,.65); display: block; }
+.flip, .art { position: absolute; left: 6px; width: 30px; height: 30px; border-radius: 50%; border: 0; padding: 0;
+  background: rgba(10, 20, 34, .85); color: var(--cyan); cursor: pointer; font-size: 15px; line-height: 30px; }
+.flip { top: 6px; } .art { top: 42px; }
+.flip:hover, .art:hover { background: var(--teal); color: var(--bg-1); }
+.icon { border: 1px solid var(--line-strong); background: var(--input); color: var(--cyan); border-radius: 6px;
+  height: 26px; padding: 0 8px; cursor: pointer; font: inherit; font-size: 12px; white-space: nowrap; }
+.icon:hover { border-color: var(--teal); }
+.card.added { animation: added .9s ease-out; }
+@keyframes added { 0% { box-shadow: 0 0 0 4px var(--ok), 0 0 40px var(--ok); transform: scale(1.04); } 100% { box-shadow: 0 6px 18px rgba(0,0,0,.45); transform: none; } }
+.card .badge { position: absolute; top: 6px; right: 6px; background: var(--ok); color: #04261a; font-weight: 700;
+  font-size: 12px; padding: 2px 8px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.card .badge.full { background: var(--yellow); color: #1a1300; }
+.card .check { position: absolute; inset: 0; display: grid; place-items: center; font-size: 72px; color: #fff;
+  background: rgba(61, 220, 151, .45); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.card.added .check { opacity: 1; }
+.card.current { box-shadow: 0 0 0 3px var(--yellow), 0 6px 18px rgba(0,0,0,.45); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); z-index: 40;
+  background: var(--ok); color: #04261a; font-weight: 700; padding: 12px 20px; border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; max-width: 90vw; }
+.toast.on { opacity: 1; transform: translateX(-50%); }
+.toast.warn { background: var(--yellow); color: #1a1300; }
+.searchrow.hidden { display: none; }
+.optrow { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+@media (max-width: 760px) {
+  .steps { margin-left: 0; }
+  .colors { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .color { padding: 10px 2px; } .color img { width: 40px; height: 40px; margin-bottom: 6px; } .color span { font-size: 12px; }
+  .pack { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .slots, .cards { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .list .type { display: none; }
+  .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .stat b { font-size: 18px; }
+}
+@media (hover: none) { .preview { display: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <h1 class="brand">Formato Bello<small>Deck builder · da Alpha a Liberatori di Kamigawa</small></h1>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+<main><div id="view"></div></main>
+
+<div class="modal-bg" id="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead"><h2 id="mTitle"></h2><button class="btn ghost" id="mClose">Chiudi</button></div>
+    <div class="row searchrow" id="mSearchRow" style="margin-bottom:8px">
+      <input type="text" id="mQuery" placeholder="Nome della carta, in italiano o in inglese" style="flex:1;min-width:200px" autocomplete="off">
+    </div>
+    <label class="optrow searchrow" id="mItRow"><input type="checkbox" id="mIt"> Mostra anche le stampe in italiano</label>
+    <div class="status" id="mStatus"></div>
+    <div class="cards" id="mResults"></div>
+  </div>
+</div>
+<div class="preview" id="preview"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.4)
+const RULES = {
+  version: "0.4",
+  cutoff: "2005-06-03",           // Liberatori di Kamigawa (Saviors of Kamigawa)
+  deckSize: 60,
+  lands: 23,
+  pickedCreatures: 10,
+  draftRounds: 10,
+  maxBombs: 6,
+  budget: 7,                      // provvisorio, da tarare sul mazzo di Fede
+  maxNonCreature: 2,
+  mhSets: ["mh1", "mh2", "mh3", "h1r"],
+};
+const COLORS = {
+  W: { name: "Bianco", basic: "Plains", glow: "#f6e7a8" },
+  U: { name: "Blu",    basic: "Island", glow: "#4aa8ff" },
+  B: { name: "Nero",   basic: "Swamp",  glow: "#b48cff" },
+  R: { name: "Rosso",  basic: "Mountain", glow: "#ff6a4d" },
+  G: { name: "Verde",  basic: "Forest", glow: "#3ddc97" },
+};
+const POINTS = {
+  3: ["Sol Ring", "Balance", "Demonic Tutor", "Survival of the Fittest", "Show and Tell",
+      "Force of Will", "Umezawa's Jitte", "Gaea's Cradle"],
+  2: ["Vampiric Tutor", "Sensei's Divining Top", "Strip Mine", "Wasteland", "Armageddon", "Moat",
+      "Crucible of Worlds", "Isochron Scepter", "Natural Order", "Hymn to Tourach", "Land Tax",
+      "Opposition", "Winter Orb", "Orcish Bowmasters", "Sheoldred, the Apocalypse"],
+  1: ["Enlightened Tutor", "Worldly Tutor", "Icy Manipulator", "Swords to Plowshares",
+      "Sylvan Library", "Brainstorm", "Dark Ritual", "Thoughtseize", "Fatal Push"],
+};
+const BANNED = ["Amulet of Quoz", "Ancestral Recall", "Bazaar of Baghdad", "Black Lotus", "Bronze Tablet",
+  "Channel", "Chaos Orb", "Contact from Below", "Darkpact", "Deathrite Shaman", "Demonic Attorney",
+  "Demonic Consultation", "Dig Through Time", "Earthcraft", "Falling Star", "Fastbond", "Flash",
+  "Frantic Search", "Gitaxian Probe", "Goblin Recruiter", "Grim Monolith", "Gush", "Hermit Druid",
+  "Imperial Seal", "Library of Alexandria", "Mana Crypt", "Mana Drain", "Mana Vault", "Memory Jar",
+  "Mental Misstep", "Mind Twist", "Mind's Desire", "Mishra's Workshop", "Mox Emerald", "Mox Jet",
+  "Mox Pearl", "Mox Ruby", "Mox Sapphire", "Mystical Tutor", "Necropotence", "Oath of Druids",
+  "Rebirth", "Shahrazad", "Skullclamp", "Tempest Efreet", "Tendrils of Agony", "Time Spiral",
+  "Time Vault", "Time Walk", "Timetwister", "Timmerian Fiends", "Tinker", "Tolarian Academy",
+  "Treasure Cruise", "Underworld Breach", "Wheel of Fortune", "Windfall", "Worldgorger Dragon",
+  "Wrenn and Six", "Yawgmoth's Bargain", "Yawgmoth's Will",
+  // moderne (5.6, 5.8)
+  "Solitude", "Grief", "Fury", "Endurance", "Subtlety", "Ragavan, Nimble Pilferer",
+  "Oko, Thief of Crowns", "Uro, Titan of Road and Sea", "Dockside Extortionist",
+  "Hogaak, Arisen Necropolis", "Murktide Regent"];
+const BANNED_SET = new Set(BANNED.map(n => n.toLowerCase()));
+const POINTS_MAP = new Map();
+for (const [p, names] of Object.entries(POINTS)) for (const n of names) POINTS_MAP.set(n.toLowerCase(), +p);
+const SYMBOL_URL = s => `https://svgs.scryfall.io/card-symbols/${s.replace(/\//g, "")}.svg`;
+
+// ---------------------------------------------------------------- STATE
+const STORE_KEY = "formatoBelloDeck.v1";
+const STEPS = ["Colore", "Le tue 10 creature", "Draft", "Bombe", "Mazzo"];
+let S = freshState();
+function freshState() {
+  return { player: "", color: null, step: 0, picked: [], draft: [], draftShown: [], bombs: [],
+           extra: [], lands: [], draftPack: null };
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
+function load() {
+  try { const raw = localStorage.getItem(STORE_KEY); if (raw) S = Object.assign(freshState(), JSON.parse(raw)); }
+  catch (e) {}
+}
+
+// ---------------------------------------------------------------- SCRYFALL
+let lastCall = 0;
+async function sf(path, params) {
+  const wait = Math.max(0, lastCall + 110 - Date.now());
+  if (wait) await new Promise(r => setTimeout(r, wait));
+  lastCall = Date.now();
+  const url = "https://api.scryfall.com" + path + (params ? "?" + new URLSearchParams(params) : "");
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  const data = await res.json();
+  if (res.status === 404) return { data: [], total_cards: 0 };
+  if (!res.ok) throw new Error(data.details || ("Errore Scryfall " + res.status));
+  return data;
+}
+function search(q, order) {
+  return sf("/cards/search", { q, unique: "cards", order: order || "edhrec" });
+}
+function toCard(c, itName) {
+  const face = c.card_faces && c.card_faces[0];
+  const img = (c.image_uris && c.image_uris.normal) || (face && face.image_uris && face.image_uris.normal) || "";
+  const back = (!c.image_uris && c.card_faces && c.card_faces[1] && c.card_faces[1].image_uris && c.card_faces[1].image_uris.normal) || "";
+  const type = c.type_line || "";
+  const oracle = c.oracle_text || (c.card_faces || []).map(f => f.oracle_text || "").join("\n");
+  return {
+    oracle_id: c.oracle_id, name: c.name, it: itName || "", type, cmc: c.cmc || 0,
+    mana: c.mana_cost || (face && face.mana_cost) || "", rarity: c.rarity,
+    set: c.set, first_set: c.set, set_name: c.set_name, number: c.collector_number, released: c.released_at,
+    lang: c.lang || "en",
+    img, back, uri: c.scryfall_uri, oracle, set_type: c.set_type,
+    creature: /\bCreature\b/.test(type), land: /\bLand\b/.test(type),
+    basic: /\bBasic\b/.test(type) && /\bLand\b/.test(type),
+    bomb: c.released_at > RULES.cutoff,
+  };
+}
+const BASE = "game:paper -is:funny -t:planeswalker prefer:oldest";
+function nameTerms(text) {
+  return text.trim().split(/\s+/).filter(Boolean).map(w => w.replace(/["()]/g, "")).join(" ");
+}
+function chunks(a, n) { const out = []; for (let i = 0; i < a.length; i += n) out.push(a.slice(i, i + n)); return out; }
+// Ricerca per nome in inglese E in italiano, poi unisce i risultati.
+// filters: colore/tipo (valgono anche sulle stampe italiane); era: limite di data (solo sulla carta).
+async function searchByName(text, filters, era) {
+  const terms = nameTerms(text);
+  const [en, it] = await Promise.all([
+    search(`${terms} ${filters} ${era || ""} ${BASE}`),
+    sf("/cards/search", { q: `${terms} lang:it ${filters}`, unique: "cards" }),
+  ]);
+  const itNames = new Map();
+  for (const c of it.data) itNames.set(c.name, c.printed_name || (c.card_faces && c.card_faces[0].printed_name) || "");
+  const found = new Map();
+  for (const c of en.data) found.set(c.name, c);
+  const missing = [...itNames.keys()].filter(n => !found.has(n)).slice(0, 120);
+  for (const group of chunks(missing, 30)) {
+    const q = "(" + group.map(n => `!"${n.replace(/"/g, "")}"`).join(" or ") + `) ${filters} ${era || ""} ${BASE}`;
+    const r = await search(q);
+    for (const c of r.data) found.set(c.name, c);
+  }
+  // risultati che iniziano con il testo cercato per primi
+  const t = text.trim().toLowerCase();
+  const score = c => {
+    const it = (itNames.get(c.name) || "").toLowerCase(), en = c.name.toLowerCase();
+    if (en === t || it === t) return 0;
+    if (en.startsWith(t) || it.startsWith(t)) return 1;
+    return 2;
+  };
+  return [...found.values()].sort((a, b) => score(a) - score(b)).map(c => toCard(c, itNames.get(c.name)));
+}
+
+// ---------------------------------------------------------------- DECK LOGIC
+function allCards() {
+  return [...S.picked.map(c => ({ ...c, qty: 1, src: "scelta" })),
+          ...S.draft.map(c => ({ ...c, qty: 1, src: "draft" })),
+          ...S.bombs.map(c => ({ ...c, qty: 1, src: "bomba" })),
+          ...S.extra.map(c => ({ ...c, src: "aggiunta" })),
+          ...S.lands.map(c => ({ ...c, src: "terra" }))];
+}
+function inDeck(name) { return allCards().some(c => c.name === name); }
+function qtyInDeck(name) { return allCards().filter(c => c.name === name).reduce((a, c) => a + c.qty, 0); }
+function total() { return allCards().reduce((a, c) => a + c.qty, 0); }
+function bombCount() { return allCards().filter(c => c.bomb).reduce((a, c) => a + c.qty, 0); }
+function maxCopies(c) {
+  if (c.basic) return 99;
+  if (c.creature || c.bomb) return 1;
+  return RULES.maxNonCreature;
+}
+function points(c) {
+  let p = POINTS_MAP.get(c.name.toLowerCase()) || 0;
+  let auto = false;
+  // la stampa scelta per l'immagine non cambia i punti: contano rarità e set della prima stampa
+  if (c.bomb && (c.rarity === "mythic" || RULES.mhSets.includes(c.first_set || c.set)) && p < 1) { p = 1; auto = true; }
+  return { p, auto };
+}
+function problems(c) {
+  const out = [];
+  if (BANNED_SET.has(c.name.toLowerCase())) out.push("bandita");
+  if (/Planeswalker/.test(c.type)) out.push("planeswalker");
+  if (c.set_type === "funny") out.push("set burlone");
+  if (/\bante\b/i.test(c.oracle)) out.push("posta");
+  if (/you win the game/i.test(c.oracle)) out.push("vittoria alternativa");
+  if (/^Companion\b|\nCompanion\b/.test(c.oracle)) out.push("compagno");
+  return out;
+}
+function needsApproval(c) {
+  return /protection from/i.test(c.oracle) || /^Circle of Protection/.test(c.name) || /^Sword of /.test(c.name);
+}
+function blockReason(c, opts) {
+  opts = opts || {};
+  const p = problems(c);
+  if (p.length) return "Vietata: " + p.join(", ");
+  if (!c.basic && inDeck(c.name) && maxCopies(c) === 1) return "Già nel mazzo";
+  if (!c.basic && qtyInDeck(c.name) >= maxCopies(c)) return `Già ${maxCopies(c)} copie nel mazzo`;
+  if (opts.classicOnly && c.bomb) return "Uscita dopo Liberatori di Kamigawa";
+  if (opts.bombOnly && !c.bomb) return "Classica: aggiungila nel mazzo";
+  if (c.bomb && bombCount() >= RULES.maxBombs) return `Hai già ${RULES.maxBombs} bombe`;
+  return "";
+}
+
+// ---------------------------------------------------------------- RENDER helpers
+const $ = id => document.getElementById(id);
+// Gesti: un clic che arriva dopo un trascinamento o una selezione di testo non attiva nulla.
+let gesture = null;
+document.addEventListener("pointerdown", e => {
+  gesture = { x: e.clientX, y: e.clientY, sel: String(getSelection()) };
+}, true);
+function isDragClick(ev) {
+  if (ev.detail === 0 || !gesture) return false;          // tastiera: sempre valida
+  const moved = Math.hypot(ev.clientX - gesture.x, ev.clientY - gesture.y) > 6;
+  const sel = String(getSelection());
+  return moved || (sel && sel !== gesture.sel);
+}
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") e.className = v;
+    else if (k === "onclick") e.addEventListener("click", ev => { if (!isDragClick(ev)) v(ev); });
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "style" && typeof v === "object") for (const [p, val] of Object.entries(v)) e.style.setProperty(p, val);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+}
+function manaCost(cost) {
+  const span = el("span");
+  for (const m of (cost || "").matchAll(/\{([^}]+)\}/g)) span.append(el("img", { class: "ms", src: SYMBOL_URL(m[1]), alt: `{${m[1]}}` }));
+  if (/\/\//.test(cost || "")) span.title = cost;
+  return span;
+}
+// Titolo di pannello con il bottone "i" che mostra/nasconde l'aiuto
+function ptitle(text, count, help) {
+  const box = el("div", { class: "help" }, help || "");
+  const head = el("div", { class: "ptitle" }, el("h2", {}, text), count != null ? el("span", { class: "count" }, count) : null);
+  if (help) {
+    const b = el("button", { class: "info", title: "Spiegazione", "aria-expanded": "false", onclick: () => {
+      const on = !box.classList.contains("on"); box.classList.toggle("on", on); b.setAttribute("aria-expanded", on);
+    } }, "i");
+    head.append(b);
+  }
+  return [head, box];
+}
+function cardImg(c) {
+  if (c.img) return el("img", { src: c.img, alt: c.name, loading: "lazy" });
+  return el("div", { class: "noimg" }, c.name);
+}
+// Bottoni sopra una carta già scelta: girare la carta (se ha il retro) e cambiare immagine
+function cardControls(c, holder) {
+  const out = [];
+  if (c.back) out.push(el("button", { class: "flip", title: "Gira la carta (fronte/retro)", onclick: () => {
+    const img = holder.querySelector("img"); if (!img) return;
+    img.src = img.src === c.back ? c.img : c.back;
+  } }, "↻"));
+  out.push(el("button", { class: "art", title: "Cambia immagine (scegli la stampa)", onclick: () => openPrints(c) }, "🖼"));
+  return out;
+}
+function hoverPreview(node, c) {
+  if (!c.img) return;
+  const pv = $("preview");
+  node.addEventListener("mouseenter", () => {
+    pv.textContent = "";
+    pv.append(el("img", { src: c.img, alt: c.name }));
+    if (c.back) pv.append(el("img", { src: c.back, alt: c.name + " (retro)" }));
+    pv.style.display = "flex";
+  });
+  node.addEventListener("mousemove", e => {
+    const one = Math.min(300, innerWidth * 0.44), w = c.back ? one * 2 + 10 : one;
+    const x = e.clientX + w + 24 > innerWidth ? Math.max(8, e.clientX - w - 16) : e.clientX + 20;
+    pv.style.left = x + "px"; pv.style.top = Math.max(8, Math.min(e.clientY - 160, innerHeight - 440)) + "px";
+  });
+  node.addEventListener("mouseleave", () => { pv.style.display = "none"; });
+}
+function hidePreview() { $("preview").style.display = "none"; }
+let toastTimer = null;
+function toast(text, warn) {
+  const t = $("toast"); t.textContent = text; t.className = "toast on" + (warn ? " warn" : "");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.className = "toast" + (warn ? " warn" : ""); }, 2200);
+}
+function filledSlot(c, onRemove) {
+  const s = el("div", { class: "slot filled" }, cardImg(c));
+  s.append(...cardControls(c, s), el("button", { class: "x", title: "Togli", onclick: onRemove }, "×"));
+  hoverPreview(s, c);
+  return s;
+}
+function stepAllowed(i) {
+  if (i === 0) return true;
+  if (!S.color) return false;
+  if (i >= 2 && S.picked.length < RULES.pickedCreatures) return false;
+  if (i >= 3 && S.draft.length < RULES.draftRounds) return false;
+  return true;
+}
+function stepDone(i) {
+  return [!!S.color, S.picked.length >= RULES.pickedCreatures, S.draft.length >= RULES.draftRounds, S.bombs.length > 0, total() >= RULES.deckSize][i];
+}
+function go(i) { if (!stepAllowed(i)) return; S.step = i; if (i === 4) ensureLands(); save(); render(); scrollTo(0, 0); }
+
+function render() {
+  hidePreview();
+  const nav = $("steps"); nav.textContent = "";
+  STEPS.forEach((name, i) => nav.append(el("button", {
+    class: S.step === i ? "on" : stepDone(i) ? "done" : "", disabled: !stepAllowed(i), onclick: () => go(i)
+  }, `${i + 1}. ${name}`)));
+  const v = $("view"); v.textContent = "";
+  [viewColor, viewPicked, viewDraft, viewBombs, viewDeck][S.step](v);
+}
+
+// ---------------------------------------------------------------- STEP 1: colore
+function viewColor(v) {
+  const p = el("section", { class: "panel" },
+    ptitle("Chi sei e che colore giochi?", null, "Il mazzo è mono colore: tutte le carte devono essere del colore scelto, più eventuali carte incolori (artefatti e terre). Ogni giocatore ha un colore suo."));
+  const name = el("input", { type: "text", value: S.player, placeholder: "Il tuo nome", style: "min-width:240px" });
+  name.addEventListener("input", () => { S.player = name.value; save(); });
+  p.append(el("div", { class: "row", style: "margin-bottom:16px" }, name));
+  const grid = el("div", { class: "colors" });
+  for (const [k, c] of Object.entries(COLORS)) {
+    grid.append(el("button", { class: "color" + (S.color === k ? " on" : ""), style: { "--glow": c.glow }, title: c.name, onclick: () => {
+      if (S.color && S.color !== k && (S.picked.length || S.draft.length || S.extra.length || S.bombs.length) &&
+          !confirm("Cambiando colore si svuota il mazzo. Continuare?")) return;
+      if (S.color !== k) { const pl = S.player; S = freshState(); S.player = pl; }
+      S.color = k; save(); render();
+    } }, el("img", { src: SYMBOL_URL(k), alt: "" }), el("span", {}, c.name)));
+  }
+  p.append(grid);
+  p.append(el("div", { class: "row", style: "margin-top:18px" },
+    el("button", { class: "btn", disabled: !S.color, onclick: () => go(1) }, "Avanti: le tue 10 creature")));
+  v.append(p);
+  v.append(el("section", { class: "panel" },
+    ptitle("Riprendi un mazzo esportato", null, "Carica il file .json esportato in precedenza da questo deck builder: riparti dal mazzo così com'era."),
+    importButton()));
+}
+
+// ---------------------------------------------------------------- STEP 2: 10 creature scelte
+function viewPicked(v) {
+  const col = COLORS[S.color];
+  const p = el("section", { class: "panel" },
+    ptitle("Le tue creature", `${S.picked.length}/${RULES.pickedCreatures}`,
+      `Clicca su un "+" e cerca una creatura ${col.name.toLowerCase()} con almeno una stampa entro Liberatori di Kamigawa. Puoi scrivere il nome in italiano o in inglese, anche solo una parte. Niente bombe qui; ogni creatura una volta sola.`));
+  const grid = el("div", { class: "slots" });
+  for (let i = 0; i < RULES.pickedCreatures; i++) {
+    const c = S.picked[i];
+    if (c) {
+      grid.append(filledSlot(c, () => { S.picked.splice(i, 1); save(); render(); }));
+    } else {
+      grid.append(el("button", { class: "slot", title: "Aggiungi creatura", onclick: () => openSearch({
+        title: "Scegli una creatura",
+        filters: `id=${S.color.toLowerCase()} t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
+        onPick: c => { S.picked.push(c); save(); render(); return true; }
+      }) }, "+"));
+    }
+  }
+  p.append(grid);
+  p.append(el("div", { class: "row", style: "margin-top:18px" },
+    el("button", { class: "btn ghost", onclick: () => go(0) }, "Indietro"),
+    el("button", { class: "btn", disabled: S.picked.length < RULES.pickedCreatures, onclick: () => go(2) }, "Avanti: draft")));
+  v.append(p);
+}
+
+// ---------------------------------------------------------------- STEP 3: draft
+let pool = null, poolColor = null;
+async function loadPool() {
+  if (pool && poolColor === S.color) return pool;
+  const q = `id=${S.color.toLowerCase()} t:creature date<=${RULES.cutoff} ${BASE}`;
+  const first = await search(q);
+  let data = first.data;
+  if (first.has_more && first.next_page) {
+    const u = new URL(first.next_page);
+    const second = await sf(u.pathname, Object.fromEntries(u.searchParams));
+    data = data.concat(second.data);
+  }
+  pool = data.map(c => toCard(c)).filter(c => !c.bomb && !problems(c).length);
+  poolColor = S.color;
+  return pool;
+}
+function makePack() {
+  const used = new Set([...S.picked, ...S.draft].map(c => c.name).concat(S.draftShown));
+  const avail = pool.filter(c => !used.has(c.name));
+  const bands = [c => c.cmc <= 2, c => c.cmc >= 3 && c.cmc <= 4, c => c.cmc >= 5];
+  const pack = [];
+  for (const band of bands) {
+    // preferenza alle carte più giocate: si pesca fra le prime 25 della fascia
+    const top = avail.filter(c => band(c) && !pack.includes(c)).slice(0, 25);
+    if (top.length) pack.push(top[Math.floor(Math.random() * top.length)]);
+  }
+  while (pack.length < 3) {
+    const rest = avail.filter(c => !pack.includes(c));
+    if (!rest.length) break;
+    pack.push(rest[Math.floor(Math.random() * Math.min(rest.length, 40))]);
+  }
+  return pack;
+}
+function viewDraft(v) {
+  const p = el("section", { class: "panel" },
+    ptitle("Draft", `${Math.min(S.draft.length + 1, RULES.draftRounds)}/${RULES.draftRounds}`,
+      "Scegli una creatura fra tre. Le proposte vengono dalle creature del tuo colore più giocate del periodo: quando possibile, una economica (fino a 2 mana), una media (3-4) e una costosa (5 o più). Se nessuna ti piace, chiedine altre tre."));
+  const status = el("div", { class: "status" }, "Carico le carte da Scryfall…");
+  p.append(status);
+  const area = el("div", { class: "pack" });
+  p.append(area);
+  const nav = el("div", { class: "row", style: "margin-top:18px" },
+    el("button", { class: "btn ghost", onclick: () => go(1) }, "Indietro"),
+    el("button", { class: "btn ghost", disabled: !S.draft.length, onclick: () => {
+      S.draft.pop(); S.draftPack = null; save(); render(); } }, "Annulla l'ultima scelta"),
+    el("button", { class: "btn", disabled: S.draft.length < RULES.draftRounds, onclick: () => go(3) }, "Avanti: bombe"));
+  v.append(p);
+  if (S.draft.length) {
+    const done = el("div", { class: "cards" });
+    for (const c of S.draft) { const n = el("div", { class: "card", style: "cursor:default" }, cardImg(c)); n.append(...cardControls(c, n)); hoverPreview(n, c); done.append(n); }
+    v.append(el("section", { class: "panel" }, ptitle("Già scelte nel draft", S.draft.length), done));
+  }
+  p.append(nav);
+  if (S.draft.length >= RULES.draftRounds) { status.textContent = "Draft completato."; return; }
+  loadPool().then(() => {
+    if (!S.draftPack || !S.draftPack.length) { S.draftPack = makePack(); save(); }
+    status.textContent = "";
+    if (!S.draftPack.length) { status.textContent = "Non ci sono più creature da proporre."; return; }
+    for (const c of S.draftPack) {
+      const n = el("button", { class: "card", title: c.name, onclick: () => {
+        S.draftShown.push(...S.draftPack.filter(x => x.name !== c.name).map(x => x.name));
+        S.draft.push(c); S.draftPack = null; save(); render();
+      } }, cardImg(c));
+      hoverPreview(n, c); area.append(n);
+    }
+    area.after(el("div", { class: "row", style: "justify-content:center;margin-top:12px" },
+      el("button", { class: "btn ghost", onclick: () => {
+        S.draftShown.push(...S.draftPack.map(x => x.name)); S.draftPack = null; save(); render();
+      } }, "Nessuna mi piace: altre tre")));
+  }).catch(e => { status.textContent = "Errore nel caricare le carte: " + e.message; });
+}
+
+// ---------------------------------------------------------------- STEP 4: bombe
+function viewBombs(v) {
+  const p = el("section", { class: "panel" },
+    ptitle("Bombe", `${S.bombs.length}/${RULES.maxBombs}`,
+      "Carte uscite dopo Liberatori di Kamigawa, del tuo colore o incolori, in copia singola. Sono facoltative. Le mitiche e le carte dei set Modern Horizons costano almeno 1 punto; le altre bombe le valuta Fede."));
+  const grid = el("div", { class: "slots" });
+  for (let i = 0; i < RULES.maxBombs; i++) {
+    const c = S.bombs[i];
+    if (c) {
+      const pt = points(c);
+      const s = filledSlot(c, () => { S.bombs.splice(i, 1); save(); render(); });
+      if (pt.p) s.append(el("span", { class: "tag" }, el("b", {}, `${pt.p} punt${pt.p === 1 ? "o" : "i"}`)));
+      grid.append(s);
+    } else {
+      grid.append(el("button", { class: "slot", title: "Aggiungi bomba", onclick: () => openSearch({
+        title: "Scegli una bomba", filters: `id<=${S.color.toLowerCase()}`, bombOnly: true,
+        onPick: c => { S.bombs.push(c); save(); render(); return true; }
+      }) }, "+"));
+    }
+  }
+  p.append(grid);
+  p.append(el("div", { class: "row", style: "margin-top:18px" },
+    el("button", { class: "btn ghost", onclick: () => go(2) }, "Indietro"),
+    el("button", { class: "btn", onclick: () => go(4) }, "Avanti: il mazzo")));
+  v.append(p);
+}
+
+// ---------------------------------------------------------------- STEP 5: mazzo
+async function ensureLands() {
+  if (S.lands.length) return;
+  const basic = COLORS[S.color].basic;
+  S.lands = [{ name: basic, type: "Basic Land — " + basic, cmc: 0, basic: true, land: true, creature: false,
+               bomb: false, img: "", oracle: "", qty: RULES.lands, rarity: "common" }];
+  save();
+  try {
+    const r = await search(`!"${basic}" prefer:oldest`);
+    if (r.data[0]) { S.lands[0] = { ...toCard(r.data[0]), qty: S.lands[0].qty }; save(); if (S.step === 4) render(); }
+  } catch (e) {}
+}
+function listFor(src) {
+  return { scelta: S.picked, draft: S.draft, bomba: S.bombs, aggiunta: S.extra, terra: S.lands }[src];
+}
+function changeQty(c, delta) {
+  const list = listFor(c.src);
+  const item = list.find(x => x.name === c.name);
+  if (!item) return;
+  const q = (item.qty || 1) + delta;
+  if (q <= 0) list.splice(list.indexOf(item), 1);
+  else if (q <= maxCopies(item)) item.qty = q;
+  save(); render();
+}
+function viewDeck(v) {
+  const cards = allCards();
+  const tot = total(), bombs = bombCount();
+  const lands = cards.filter(c => c.land).reduce((a, c) => a + c.qty, 0);
+  const creatures = cards.filter(c => c.creature).reduce((a, c) => a + c.qty, 0);
+  const pts = cards.reduce((a, c) => a + points(c).p * c.qty, 0);
+
+  const p = el("section", { class: "panel" },
+    ptitle(`Il mazzo di ${S.player || "…"}`, COLORS[S.color].name,
+      "Qui completi e modifichi tutto: aggiungi magie, artefatti e terre non base, cambi le copie, togli carte. Per mettere una terra non base, togli una terra base con il −. Le creature restano sempre in copia singola, le altre carte al massimo 2."));
+  p.append(el("div", { class: "summary" },
+    stat(`${tot}/${RULES.deckSize}`, "carte", tot >= RULES.deckSize ? "ok" : "warn"),
+    stat(creatures, "creature"), stat(lands, "terre"),
+    stat(`${bombs}/${RULES.maxBombs}`, "bombe", bombs > RULES.maxBombs ? "bad" : ""),
+    stat(`${pts}/${RULES.budget}`, "punti (provvisori)", pts > RULES.budget ? "warn" : "")));
+  p.append(el("div", { class: "row", style: "margin-bottom:12px" },
+    el("button", { class: "btn", onclick: () => openSearch({
+      title: "Aggiungi una carta", filters: `id<=${S.color.toLowerCase()}`,
+      onPick: c => {
+        const ex = S.extra.find(x => x.name === c.name);
+        if (ex) { if (ex.qty >= maxCopies(ex)) return false; ex.qty++; }
+        else S.extra.push({ ...c, qty: 1 });
+        save(); render(); return true;
+      }, keepOpen: true }) }, "+ Aggiungi carta"),
+    el("button", { class: "btn ghost", onclick: () => exportTxt() }, "Esporta lista (.txt)"),
+    el("button", { class: "btn ghost", onclick: () => exportJson() }, "Esporta per Fede (.json)"),
+    el("button", { class: "btn ghost", onclick: () => copyList() }, "Copia lista"),
+    importButton(),
+    el("button", { class: "btn danger", onclick: () => {
+      if (confirm("Ricominciare da capo? Il mazzo attuale verrà cancellato da questo browser.")) { S = freshState(); save(); render(); }
+    } }, "Ricomincia")));
+
+  const groups = [
+    ["Creature", cards.filter(c => c.creature && !c.bomb)],
+    ["Bombe", cards.filter(c => c.bomb)],
+    ["Altre carte", cards.filter(c => !c.creature && !c.bomb && !c.land)],
+    ["Terre", cards.filter(c => c.land && !c.bomb)],
+  ];
+  const table = el("table", { class: "list" },
+    el("thead", {}, el("tr", {}, el("th", {}, "Copie"), el("th", {}, "Carta"), el("th", { class: "type" }, "Tipo"), el("th", {}, "Mana"), el("th", {}, "Note"), el("th", {}, ""))));
+  const tb = el("tbody");
+  for (const [label, list] of groups) {
+    if (!list.length) continue;
+    const n = list.reduce((a, c) => a + c.qty, 0);
+    tb.append(el("tr", { class: "group" }, el("th", { colspan: 6 }, `${label} (${n})`)));
+    list.sort((a, b) => a.cmc - b.cmc || a.name.localeCompare(b.name));
+    for (const c of list) {
+      const pt = points(c), prob = problems(c);
+      const notes = [];
+      if (c.src === "scelta") notes.push(el("span", { class: "pill" }, "scelta"));
+      if (c.src === "draft") notes.push(el("span", { class: "pill" }, "draft"));
+      if (c.bomb) notes.push(el("span", { class: "pill bomb" }, "bomba"));
+      if (pt.p) notes.push(el("span", { class: "pill pts" }, `${pt.p} pt${pt.auto ? " (auto)" : ""}`));
+      if (prob.length) notes.push(el("span", { class: "pill bad" }, prob.join(", ")));
+      if (needsApproval(c)) notes.push(el("span", { class: "pill bomb" }, "protezione: va approvata"));
+      if (c.back) notes.push(el("span", { class: "pill" }, "due facce"));
+      const nameCell = el("td", {}, c.uri ? el("a", { href: c.uri, target: "_blank", rel: "noopener" }, c.name) : c.name,
+        c.it && c.it !== c.name ? el("span", { class: "it" }, c.it) : null);
+      const row = el("tr", {},
+        el("td", { class: "n" },
+          el("button", { class: "mini", title: "Togli una copia", onclick: () => changeQty(c, -1) }, "−"), " ",
+          el("b", {}, c.qty), " ",
+          el("button", { class: "mini", title: "Aggiungi una copia", disabled: c.qty >= maxCopies(c), onclick: () => changeQty(c, +1) }, "+")),
+        nameCell, el("td", { class: "type" }, c.type), el("td", {}, manaCost(c.mana)), el("td", {}, notes),
+        el("td", {}, el("button", { class: "icon", title: "Cambia immagine (scegli la stampa)", onclick: () => openPrints(c) }, "🖼 Immagine")));
+      hoverPreview(row, c);   // passando sopra la riga: carta ingrandita, con il retro se c'è
+      tb.append(row);
+    }
+  }
+  table.append(tb);
+  p.append(table);
+  v.append(p);
+  v.append(checksPanel(cards, tot, bombs, pts));
+  v.append(el("div", { class: "row" }, el("button", { class: "btn ghost", onclick: () => go(3) }, "Indietro")));
+}
+function stat(big, small, cls) {
+  return el("div", { class: "stat" }, el("b", { class: cls || "" }, String(big)), el("span", {}, small));
+}
+function checksPanel(cards, tot, bombs, pts) {
+  const li = (ok, text) => el("li", { class: ok === true ? "ok" : ok === "warn" ? "warn" : "bad" }, (ok === true ? "✓ " : ok === "warn" ? "! " : "✗ ") + text);
+  const ul = el("ul", { class: "checks" });
+  ul.append(li(tot >= RULES.deckSize, `Carte: ${tot} (minimo ${RULES.deckSize})`));
+  ul.append(li(bombs <= RULES.maxBombs, `Bombe: ${bombs} (massimo ${RULES.maxBombs})`));
+  const over = cards.filter(c => c.qty > maxCopies(c));
+  ul.append(li(!over.length, over.length ? "Troppe copie: " + over.map(c => c.name).join(", ") : "Copie: creature e bombe singole, altre carte massimo 2"));
+  const names = cards.filter(c => !c.basic).map(c => c.name);
+  const dup = names.filter((n, i) => names.indexOf(n) !== i);
+  ul.append(li(!dup.length, dup.length ? "Carte ripetute in più sezioni: " + [...new Set(dup)].join(", ") : "Nessuna carta ripetuta"));
+  const bad = cards.filter(c => problems(c).length);
+  ul.append(li(!bad.length, bad.length ? "Carte vietate: " + bad.map(c => c.name).join(", ") : "Nessuna carta vietata"));
+  const appr = cards.filter(needsApproval);
+  if (appr.length) ul.append(li("warn", "Protezioni da far approvare al gruppo: " + appr.map(c => c.name).join(", ")));
+  ul.append(li(pts <= RULES.budget ? true : "warn", `Punti: ${pts} su ${RULES.budget} (budget provvisorio)`));
+  const unrated = cards.filter(c => c.bomb && !points(c).p);
+  if (unrated.length) ul.append(li("warn", "Bombe senza punti in lista, da valutare con Fede: " + unrated.map(c => c.name).join(", ")));
+  return el("section", { class: "panel" },
+    ptitle("Controlli", null, `Regole dal regolamento v${RULES.version}. Quando hai finito, esporta il .json e mandalo a Fede: controlla i punti e prepara le proxy da stampare.`), ul);
+}
+
+// ---------------------------------------------------------------- EXPORT / IMPORT
+function deckLines() {
+  const cards = allCards();
+  const sec = (label, list) => list.length ? [`// ${label} (${list.reduce((a, c) => a + c.qty, 0)})`, ...list.map(c => `${c.qty} ${c.name}`), ""] : [];
+  return [`// Formato Bello — mazzo di ${S.player || "?"} — ${COLORS[S.color].name} — ${new Date().toISOString().slice(0, 10)}`, "",
+    ...sec("Creature", cards.filter(c => c.creature && !c.bomb)),
+    ...sec("Bombe", cards.filter(c => c.bomb)),
+    ...sec("Altre carte", cards.filter(c => !c.creature && !c.bomb && !c.land)),
+    ...sec("Terre", cards.filter(c => c.land && !c.bomb))].join("\n");
+}
+function download(name, text, type) {
+  const a = el("a", { href: URL.createObjectURL(new Blob([text], { type })), download: name });
+  document.body.append(a); a.click(); a.remove();
+}
+function fileBase() { return `FormatoBello_${(S.player || "mazzo").replace(/[^\w-]+/g, "_")}_${S.color}`; }
+function exportTxt() { download(fileBase() + ".txt", deckLines(), "text/plain"); }
+function exportJson() {
+  const cards = allCards().map(c => ({ qty: c.qty, name: c.name, name_it: c.it || "", section: c.src, bomb: c.bomb,
+    creature: c.creature, set: c.set, collector_number: c.number, released: c.released,
+    rarity: c.rarity, points: points(c).p, scryfall: c.uri }));
+  download(fileBase() + ".json", JSON.stringify({ format: "Formato Bello", rules_version: RULES.version,
+    exported_at: new Date().toISOString(), player: S.player, color: S.color, total: total(),
+    cards, state: S }, null, 2), "application/json");
+}
+function copyList() {
+  navigator.clipboard.writeText(deckLines()).then(() => alert("Lista copiata negli appunti."), () => alert("Copia non riuscita: usa Esporta lista."));
+}
+function importButton() {
+  const inp = el("input", { type: "file", accept: ".json,application/json", style: "display:none" });
+  inp.addEventListener("change", () => {
+    const f = inp.files[0]; if (!f) return;
+    f.text().then(t => {
+      const d = JSON.parse(t);
+      if (!d.state || !d.state.color) throw new Error("file non riconosciuto");
+      S = Object.assign(freshState(), d.state); S.step = 4; save(); render();
+    }).catch(e => alert("Import non riuscito: " + e.message));
+  });
+  return el("span", {}, inp, el("button", { class: "btn ghost", onclick: () => inp.click() }, "Importa .json"));
+}
+
+// ---------------------------------------------------------------- SEARCH MODAL
+// Nessuna chiusura cliccando sullo sfondo: solo "Chiudi" o Esc.
+let modalOpts = null, searchTimer = null, searchSeq = 0;
+function setMode(mode) {
+  $("mSearchRow").classList.toggle("hidden", mode !== "search");
+  $("mItRow").classList.toggle("hidden", mode !== "prints");
+}
+function openSearch(opts) {
+  modalOpts = opts; setMode("search");
+  $("mTitle").textContent = opts.title;
+  $("mQuery").value = ""; $("mResults").textContent = "";
+  $("mStatus").textContent = "Scrivi almeno 3 lettere, in italiano o in inglese.";
+  $("modal").classList.add("on"); $("mQuery").focus();
+}
+// ---- scelta dell'immagine: tutte le stampe della carta
+let printsCard = null;
+function openPrints(c) {
+  hidePreview();
+  printsCard = c; modalOpts = { prints: true }; setMode("prints");
+  $("mTitle").textContent = `Immagine di ${c.name}`;
+  $("modal").classList.add("on");
+  loadPrints();
+}
+async function loadPrints() {
+  const c = printsCard; if (!c) return;
+  const seq = ++searchSeq;
+  $("mResults").textContent = ""; $("mStatus").textContent = "Carico le stampe…";
+  const it = $("mIt").checked;
+  const who = c.oracle_id ? `oracleid:${c.oracle_id}` : `!"${c.name.replace(/"/g, "")}"`;
+  try {
+    const params = { q: `${who} -is:digital ${it ? "(lang:en or lang:it)" : "lang:en"}`, unique: "prints", order: "released", dir: "asc" };
+    if (it) params.include_multilingual = "true";
+    const r = await sf("/cards/search", params);
+    if (seq !== searchSeq) return;
+    $("mStatus").textContent = `${r.total_cards} stampe${r.has_more ? " (mostro le prime " + r.data.length + ")" : ""}. Le prime sono le più vecchie; clicca quella che vuoi.`;
+    for (const p of r.data) {
+      const pc = toCard(p);
+      const current = pc.set === c.set && pc.number === c.number && pc.lang === (c.lang || "en");
+      const label = `${p.set_name} · ${p.released_at.slice(0, 4)}${p.promo ? " · promo" : ""}${p.lang === "it" ? " · IT" : ""}`;
+      const n = el("button", { class: "card" + (current ? " current" : ""), title: label, onclick: () => {
+        applyPrint(c.name, pc); closeSearch(); render(); toast(`🖼 Immagine cambiata: ${label}`);
+      } }, cardImg(pc), el("span", { class: "tag" }, current ? el("b", {}, "Attuale — ") : null, label));
+      hoverPreview(n, pc);
+      $("mResults").append(n);
+    }
+  } catch (e) { if (seq === searchSeq) $("mStatus").textContent = "Errore: " + e.message; }
+}
+// Cambia solo l'aspetto (immagine e stampa per le proxy); colore, bomba e punti restano quelli della carta.
+function applyPrint(name, p) {
+  const patch = { img: p.img, back: p.back, set: p.set, set_name: p.set_name, number: p.number, uri: p.uri, lang: p.lang, print_released: p.released };
+  for (const list of [S.picked, S.draft, S.bombs, S.extra, S.lands])
+    for (const c of list) if (c.name === name) { if (!c.first_set) c.first_set = c.set; Object.assign(c, patch); }
+  save();
+}
+$("mIt").addEventListener("change", loadPrints);
+function closeSearch() { $("modal").classList.remove("on"); hidePreview(); modalOpts = null; printsCard = null; searchSeq++; }
+async function runSearch() {
+  const text = $("mQuery").value.trim();
+  if (!modalOpts || modalOpts.prints) return;
+  if (text.length < 3) { $("mResults").textContent = ""; $("mStatus").textContent = "Scrivi almeno 3 lettere, in italiano o in inglese."; return; }
+  const opts = modalOpts, seq = ++searchSeq;
+  $("mStatus").textContent = "Cerco…";
+  try {
+    let data = await searchByName(text, opts.filters, opts.era);
+    if (seq !== searchSeq) return;                         // è arrivata una ricerca più recente
+    if (opts.classicOnly) data = data.filter(c => !c.bomb);
+    if (opts.bombOnly) data = data.filter(c => c.bomb);
+    $("mResults").textContent = "";
+    $("mStatus").textContent = data.length ? `${data.length} carte trovate${data.length > 60 ? " (mostro le prime 60: scrivi di più per restringere)" : ""}.` : "Nessuna carta trovata con questi criteri.";
+    for (const c of data.slice(0, 60)) {
+      const why = blockReason(c, opts);
+      const pt = points(c);
+      const label = c.it && c.it !== c.name ? `${c.it} · ${c.name}` : c.name;
+      const extra = why || [c.bomb ? "Bomba" : "", pt.p ? `${pt.p} pt` : ""].filter(Boolean).join(" · ");
+      const badge = el("span", { class: "badge" });
+      const tagExtra = el("b", {}, extra ? " — " + extra : "");
+      const setBadge = () => {
+        const q = qtyInDeck(c.name), max = maxCopies(c);
+        badge.style.display = q ? "" : "none";
+        badge.textContent = c.basic ? `${q} nel mazzo` : `✓ ${q}/${max}`;
+        badge.classList.toggle("full", !c.basic && q >= max);
+      };
+      setBadge();
+      const n = el("button", { class: "card" + (why ? " dis" : ""), title: why ? `${label} — ${why}` : label, onclick: () => {
+        const block = blockReason(c, opts);
+        if (block) { toast(`${c.name}: ${block.toLowerCase()}`, true); return; }
+        const ok = opts.onPick(c);
+        if (!ok) { toast(`${c.name}: numero massimo di copie raggiunto`, true); return; }
+        const q = qtyInDeck(c.name), max = maxCopies(c);
+        toast(`✓ ${c.it || c.name} aggiunta` + (c.basic ? ` (${q} nel mazzo)` : ` — ${q}/${max} nel mazzo`));
+        if (!opts.keepOpen) { closeSearch(); return; }
+        n.classList.remove("added"); void n.offsetWidth; n.classList.add("added");
+        setBadge();
+        const now = blockReason(c, opts);
+        if (now) { n.classList.add("dis"); n.title = `${label} — ${now}`; tagExtra.textContent = " — " + now; }
+        $("mStatus").textContent = `Aggiunta: ${c.name}. Puoi aggiungerne altre.`;
+      } }, cardImg(c), badge, el("span", { class: "check" }, "✓"), el("span", { class: "tag" }, label, tagExtra));
+      hoverPreview(n, c);
+      $("mResults").append(n);
+    }
+  } catch (e) { if (seq === searchSeq) $("mStatus").textContent = "Errore: " + e.message; }
+}
+$("mClose").addEventListener("click", closeSearch);
+$("mQuery").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 450); });
+$("mQuery").addEventListener("keydown", e => { if (e.key === "Enter") { clearTimeout(searchTimer); runSearch(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && modalOpts) closeSearch(); });
+
+// Mazzi salvati con la v0.2: recupera il retro delle carte a due facce
+async function upgradeBacks() {
+  const lists = [S.picked, S.draft, S.bombs, S.extra];
+  const todo = lists.flat().filter(c => c.back === undefined && / \/\/ /.test(c.type) && c.set && c.number);
+  for (const c of todo) {
+    try {
+      const p = await sf(`/cards/${c.set}/${encodeURIComponent(c.number)}`);
+      const back = toCard(p).back;
+      for (const l of lists) for (const x of l) if (x.name === c.name) x.back = back;
+    } catch (e) {}
+  }
+  if (todo.length) { save(); render(); }
+}
+
+load();
+if (S.step === 4) ensureLands();
+render();
+upgradeBacks();
+</script>
+</body>
+</html>
