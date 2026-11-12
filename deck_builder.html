@@ -7,7 +7,7 @@
 <title>Formato Bello — Deck Builder</title>
 <!--
   Formato Bello — Deck Builder (v0.5, 2026-11-12)
-  Regole e Lista Punti dal regolamento del Formato Bello v0.7: se il
+  Regole e Lista Punti dal regolamento del Formato Bello v0.8: se il
   regolamento cambia, aggiornare la sezione RULES qui sotto.
   Dati, immagini e simboli di mana: API pubblica di Scryfall (serve Internet).
   Non affiliato a Wizards of the Coast né a Scryfall.
@@ -228,9 +228,9 @@ h4.grp { margin: 14px 0 8px; font-size: 13px; text-transform: uppercase; letter-
 
 <script>
 "use strict";
-// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.7)
+// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.8)
 const RULES = {
-  version: "0.7",
+  version: "0.8",
   cutoff: "2005-06-03",           // Liberatori di Kamigawa (Saviors of Kamigawa)
   deckSize: 60,                   // comandante compreso (1.1)
   lands: 23,                      // punto di partenza (1.5)
@@ -288,7 +288,10 @@ const BANNED_COMMANDERS = ["Rofellos, Llanowar Emissary", "Erayo, Soratami Ascen
   // troppo forti o poco divertenti da comandante (v0.7)
   "Meloku the Clouded Mirror", "Hokori, Dust Drinker", "Memnarch",
   "Godo, Bandit Warlord", "Kokusho, the Evening Star", "Eight-and-a-Half-Tails",
-  "Multani, Maro-Sorcerer", "Azusa, Lost but Seeking"];
+  "Multani, Maro-Sorcerer", "Azusa, Lost but Seeking",
+  // creature non leggendarie con abilità ripetibili (v0.8)
+  "Royal Assassin", "Prodigal Sorcerer", "Grim Lavamancer", "Mother of Runes", "Archivist",
+  "Flametongue Kavu", "Nekrataal", "Master Decoy"];
 const APPROVE_COMMANDERS = [];
 const BANNED_SET = new Set(BANNED.map(n => n.toLowerCase()));
 const POINTS_MAP = new Map();
@@ -438,7 +441,7 @@ function needsApproval(c) {
 // Il comandante (8.1, 8.3): ritorna il motivo per cui non va bene, oppure ""
 function commanderProblem(c) {
   if (!c) return "Manca il comandante";
-  if (!c.legendary || !c.creature) return "Non è una creatura leggendaria";
+  if (!c.creature) return "Non è una creatura";   // 8.1 v0.8: anche non leggendaria
   if (c.bomb) return "Uscito dopo Liberatori di Kamigawa: il comandante deve essere classico";
   if (c.ci && c.ci !== S.color) return "Non è del colore del mazzo";
   if (BANNED_COMMANDERS.includes(front(c.name))) return "Vietato come comandante (8.3)";
@@ -617,7 +620,7 @@ function viewColor(v) {
 function commanderSearchOpts() {
   return {
     title: "Scegli il comandante", commander: true,
-    filters: `id=${S.color.toLowerCase()} t:legendary t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
+    filters: `id=${S.color.toLowerCase()} t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
     onPick: c => { S.commander = c; save(); render(); return true; },
   };
 }
@@ -626,7 +629,7 @@ function viewCommander(v) {
   const col = COLORS[S.color];
   const p = el("section", { class: "panel" },
     ptitle("Il comandante", null,
-      `Una creatura leggendaria ${col.name.toLowerCase()} uscita entro Liberatori di Kamigawa. Comincia la partita nella zona di comando e da lì la puoi lanciare quando vuoi; ogni volta che la rilanci costa {2} in più. Se va nel cimitero o in esilio puoi rimetterla nella zona di comando. Alcuni comandanti troppo forti sono vietati (regola 8.3).`));
+      `Una creatura ${col.name.toLowerCase()}, leggendaria o no, uscita entro Liberatori di Kamigawa. Comincia la partita nella zona di comando e da lì la puoi lanciare quando vuoi; ogni volta che la rilanci costa {2} in più. Se va nel cimitero o in esilio puoi rimetterla nella zona di comando. Alcuni comandanti troppo forti sono vietati (regola 8.3).`));
   const row = el("div", { class: "cmdpick" });
   if (S.commander) {
     const why = commanderProblem(S.commander);
@@ -651,7 +654,7 @@ function viewCommander(v) {
   p.append(row);
   v.append(p);
   // Suggerimenti: i comandanti classici più giocati del colore
-  const sp = el("section", { class: "panel" }, ptitle("I più giocati del tuo colore", null, "Creature leggendarie classiche del tuo colore, ordinate per popolarità su Scryfall (classifica EDHREC). Quelle vietate come comandante non compaiono."));
+  const sp = el("section", { class: "panel" }, ptitle("I più giocati del tuo colore", null, "Creature classiche del tuo colore, leggendarie o no, ordinate per popolarità su Scryfall (classifica EDHREC). Quelle vietate come comandante non compaiono."));
   const grid = el("div", { class: "cards" });
   const st = el("div", { class: "status" }, "Carico…");
   sp.append(st, grid);
@@ -666,7 +669,7 @@ function viewCommander(v) {
     }
   };
   if (cmdSuggest && cmdSuggestColor === S.color) fill();
-  else search(`id=${S.color.toLowerCase()} t:legendary t:creature date<=${RULES.cutoff} ${BASE}`).then(r => {
+  else search(`id=${S.color.toLowerCase()} t:creature date<=${RULES.cutoff} ${BASE}`).then(r => {
     cmdSuggest = r.data.map(c => toCard(c)).filter(c => !commanderProblem(c)); cmdSuggestColor = S.color;
     if (S.step === 1) fill();
   }).catch(e => { st.textContent = "Errore nel caricare i suggerimenti: " + e.message; });
@@ -1031,7 +1034,7 @@ async function runSearch() {
       const names = await whyNone(text);
       if (seq !== searchSeq) return;
       $("mStatus").textContent = !names.length ? "Nessuna carta con questo nome su Scryfall: controlla come è scritto."
-        : opts.commander ? `Trovate ${names.length} carte con questo nome (es. ${names.slice(0, 3).join(", ")}), ma nessuna è una creatura leggendaria classica ${COLORS[S.color].name.toLowerCase()}.`
+        : opts.commander ? `Trovate ${names.length} carte con questo nome (es. ${names.slice(0, 3).join(", ")}), ma nessuna è una creatura classica ${COLORS[S.color].name.toLowerCase()}.`
         : `Trovate ${names.length} carte con questo nome (es. ${names.slice(0, 3).join(", ")}), ma nessuna è del tuo colore o incolore.`;
       return;
     }
