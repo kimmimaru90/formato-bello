@@ -1,8 +1,9 @@
 # Formato Bello — Regolamento
 
-**Versione 0.5 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
-dalla v0.1 in poi; la v0.5 introduce i punti espliciti per le bombe e il
-budget di 8 punti. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
+**Versione 0.7 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
+dalla v0.1 in poi; la v0.6 ha introdotto il comandante (sezione 8) e la copia
+singola per tutte le carte, la v0.7 fissa i comandanti vietati e toglie il
+danno da comandante. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
 I punti ancora aperti sono marcati **[DA DECIDERE]**. Le regole superate sono
 conservate in fondo, nella sezione storica.
 
@@ -21,19 +22,16 @@ conservate in fondo, nella sezione storica.
 
 ## 1. Costruzione del mazzo
 
-- **1.1 Dimensioni:** almeno 60 carte nel mazzo e al massimo 15 di sideboard.
-  Tutti i limiti si contano sulle **75 carte complessive**.
-- **1.2 Copie:**
-  - **creature: copia singola**, classiche o bombe che siano;
-  - **tutte le altre carte** (magie, artefatti, incantesimi, terre non base):
-    **massimo 2 copie**;
-  - terre base: senza limite;
-  - bombe: sempre in copia singola (regola 3.2).
-  Così ogni mazzo è un miscuglio di creature diverse.
-- **1.5 Terre:** il deck builder parte da **23 terre base** su 60 (37 slot
-  per il resto). Si può sostituire una terra base con una terra non base, per
-  esempio una Foresta con Gaea's Cradle. **[DA DECIDERE]** se 23 terre è una
-  regola fissa o solo il punto di partenza.
+- **1.1 Dimensioni:** almeno 60 carte nel mazzo, **comandante compreso**
+  (sezione 8), e al massimo 15 di sideboard. Tutti i limiti si contano sulle
+  **75 carte complessive**.
+- **1.2 Copie: copia singola per tutte le carte** (creature, magie,
+  artefatti, incantesimi, terre non base, bombe). Solo le terre base sono
+  senza limite. Ogni mazzo è un miscuglio di carte diverse, come in Commander.
+- **1.5 Terre:** il deck builder parte da **23 terre base** su 60 (il
+  comandante più 36 slot per il resto). Si può sostituire una terra base con
+  una terra non base, per esempio una Foresta con Gaea's Cradle.
+  **[DA DECIDERE]** se 23 terre è una regola fissa o solo il punto di partenza.
 - **1.3 Mono colore (punto di partenza):** ogni mazzo usa **un solo colore**,
   più carte incolori (artefatti e terre). È vietata una carta che nel costo o
   nel testo ha simboli di mana di un altro colore. Si parte così; il gruppo
@@ -171,6 +169,43 @@ le propongono.
   tutti contro tutti o in altri modi decisi la sera stessa.
 - **7.2** Si usano le regole di gioco ufficiali correnti (mulligan London, ecc.).
 
+## 8. Il comandante (v0.6)
+
+Proposto dagli amici di Fede al primo confronto. Si usano le meccaniche di
+Commander, adattate a un mazzo da 60 carte.
+
+- **8.1 Chi può esserlo:** una **creatura leggendaria classica** (regola 2.1,
+  quindi mai una bomba), del **colore del mazzo**: la sua identità di colore
+  è esattamente quel colore. Il comandante fa parte delle 60 carte.
+- **8.2 Zona di comando:** a inizio partita il comandante è nella zona di
+  comando e da lì si può lanciare. Ogni volta che lo lanci dalla zona di
+  comando costa **{2} in più per ogni volta che l'hai già lanciato da lì**
+  (tassa del comandante). Se andrebbe nel cimitero, in esilio, in mano o nel
+  grimorio, il proprietario può rimetterlo nella zona di comando.
+- **8.3 Non troppo forte:**
+  - il comandante paga i punti della Lista Punti come ogni altra carta;
+  - **comandanti vietati** (v0.7). Restano giocabili nel mazzo come carte
+    normali; non possono essere il comandante:
+    - troppo forti dalla zona di comando, cioè sempre disponibili: Rofellos,
+      Llanowar Emissary; Erayo, Soratami Ascendant; Kiki-Jiki, Mirror Breaker;
+      Braids, Cabal Minion;
+    - i cinque leggendari simbolo, uno per colore, per equità fra i
+      giocatori: Jareth, Leonine Titan (bianco); Arcanis the Omnipotent
+      (blu); Visara the Dreadful (nero); Rorix Bladewing (rosso); Silvos,
+      Rogue Elemental (verde);
+    - altri troppo forti o poco divertenti da comandante: Meloku the Clouded
+      Mirror (un esercito di Illusioni volanti), Hokori, Dust Drinker (blocca
+      le terre di tutti), Memnarch (ruba qualsiasi permanente);
+  - un comandante con un'abilità che si ripete ogni turno e rimuove,
+    ruba o fa pescare va **presentato al gruppo** prima della serata.
+    Da presentare in ogni caso: Godo, Bandit Warlord (cerca un
+    Equipaggiamento, per esempio il Jitte); Kokusho, the Evening Star (5 vite
+    a ogni avversario ogni volta che muore); Eight-and-a-Half-Tails
+    (protezioni ripetute); Multani, Maro-Sorcerer (enorme e intoccabile);
+    Azusa, Lost but Seeking (due terre in più a turno).
+- **8.4 Danno da comandante: non si usa.** In Commander si perde con 21 danni
+  da un solo comandante, ma lì si parte da 40 punti vita; qui si parte da 20.
+
 ## Mappa delle regole originali (PDF)
 
 | Regola originale | Dove si trova adesso |
@@ -179,7 +214,7 @@ le propongono.
 | 2 — Planeswalker vietati | 5.1 |
 | 3 — Tetto 20 € / bombe 10 € | Superata: proxy (6) e Lista Punti (4) |
 | 4 — Niente combo pure, light-combo ok | 5.2 |
-| 5 — Massimo 3 copie | 1.2 (ora creature 1 copia, altre carte 2) |
+| 5 — Massimo 3 copie | 1.2 (ora copia singola per tutto, terre base escluse) |
 | 6 — Colori scelti da noi, altrimenti random | 1.3–1.4 (ora mono colore) |
 | 7 — Niente posta né set burloni | 5.4 |
 | 8 — Protezioni selettive approvate da tutti | 5.7 |
@@ -222,7 +257,42 @@ le propongono.
   di 1 punto per le mitiche e le Modern Horizons non in lista, budget 8.
   Analisi di partenza: `Possibili Configurazioni/2026_11_12_bombe_e_configurazioni.html`.
 
+## Decisioni del gruppo (2026-11-12, primo confronto con gli amici)
+
+- Si aggiunge un comandante con le meccaniche di Commander: solo carte
+  classiche e non troppo forte (sezione 8).
+- Tutte le carte in copia singola, magie comprese.
+- Il deck builder cambia: colore, comandante, poi le carte a mano; il draft
+  diventa una modalità facoltativa.
+
+## Decisioni di Fede (2026-11-12, sui punti aperti del comandante)
+
+- Approvati i 5 comandanti vietati proposti (Rofellos, Arcanis, Erayo,
+  Kiki-Jiki, Braids).
+- Visara: invece di un limite solo per lei, sono vietati come comandante i
+  cinque leggendari simbolo, uno per colore: Visara, Arcanis, Rorix, Silvos,
+  Jareth.
+- Il danno da comandante non si usa.
+- Aggiunti su proposta di Claude: vietati Meloku, Hokori e Memnarch; da
+  presentare al gruppo Godo, Kokusho, Eight-and-a-Half-Tails, Multani e Azusa.
+
 ## Sezione storica
+
+### Regole della v0.6 superate dalla v0.7
+
+- *8.3 v0.6 — Comandanti vietati, proposta iniziale [DA DECIDERE]:* Rofellos,
+  Arcanis, Erayo, Kiki-Jiki, Braids; Visara "da presentare al gruppo" come
+  esempio. Ora la lista comprende anche i cinque leggendari simbolo.
+- *8.4 v0.6 — Danno da comandante: proposta di non usarlo [DA DECIDERE]:*
+  confermato, non si usa.
+
+### Regole della v0.5 superate dalla v0.6
+
+- *1.1 v0.5 — Almeno 60 carte nel mazzo:* ora il comandante è compreso nelle 60.
+- *1.2 v0.5 — Creature in copia singola, tutte le altre carte al massimo in 2
+  copie:* ora copia singola per tutte, tranne le terre base.
+- *1.5 v0.5 — 23 terre base su 60, cioè 37 slot per il resto:* ora 36,
+  perché uno è il comandante.
 
 ### Regole della v0.4 superate dalla v0.5
 
