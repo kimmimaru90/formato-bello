@@ -15,7 +15,7 @@ comandante e qualche carta moderna in dosi controllate.
   *Liberatori di Kamigawa* (giugno 2005).
 - **Mono colore:** un solo colore per mazzo, più carte incolori. Ogni
   giocatore ha il suo colore.
-- **Comandante:** una creatura leggendaria classica del tuo colore. Parte
+- **Comandante:** una creatura classica del tuo colore, leggendaria o no. Parte
   dalla zona di comando, da lì si lancia, e ogni volta che la rilanci costa
   {2} in più; se va nel cimitero o in esilio torna nella zona di comando.
   Niente danno da comandante. Alcuni comandanti sono vietati (regola 8.3).
