@@ -195,14 +195,14 @@ Commander, adattate a un mazzo da 60 carte.
       Rogue Elemental (verde);
     - altri troppo forti o poco divertenti da comandante: Meloku the Clouded
       Mirror (un esercito di Illusioni volanti), Hokori, Dust Drinker (blocca
-      le terre di tutti), Memnarch (ruba qualsiasi permanente);
+      le terre di tutti), Memnarch (ruba qualsiasi permanente), Godo, Bandit
+      Warlord (cerca un Equipaggiamento, per esempio il Jitte), Kokusho, the
+      Evening Star (5 vite a ogni avversario ogni volta che muore),
+      Eight-and-a-Half-Tails (protezioni ripetute), Multani, Maro-Sorcerer
+      (enorme e intoccabile), Azusa, Lost but Seeking (due terre in più a
+      turno);
   - un comandante con un'abilità che si ripete ogni turno e rimuove,
     ruba o fa pescare va **presentato al gruppo** prima della serata.
-    Da presentare in ogni caso: Godo, Bandit Warlord (cerca un
-    Equipaggiamento, per esempio il Jitte); Kokusho, the Evening Star (5 vite
-    a ogni avversario ogni volta che muore); Eight-and-a-Half-Tails
-    (protezioni ripetute); Multani, Maro-Sorcerer (enorme e intoccabile);
-    Azusa, Lost but Seeking (due terre in più a turno).
 - **8.4 Danno da comandante: non si usa.** In Commander si perde con 21 danni
   da un solo comandante, ma lì si parte da 40 punti vita; qui si parte da 20.
 
@@ -275,6 +275,8 @@ Commander, adattate a un mazzo da 60 carte.
 - Il danno da comandante non si usa.
 - Aggiunti su proposta di Claude: vietati Meloku, Hokori e Memnarch; da
   presentare al gruppo Godo, Kokusho, Eight-and-a-Half-Tails, Multani e Azusa.
+  Correzione di Fede, stesso giorno: anche questi ultimi cinque sono
+  **vietati** come comandante (17 in tutto).
 
 ## Sezione storica
 
