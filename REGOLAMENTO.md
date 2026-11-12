@@ -1,7 +1,8 @@
 # Formato Bello — Regolamento
 
-**Versione 0.4 — 2026-11-11.** Contiene le decisioni di Fede sui punti aperti
-della v0.1. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
+**Versione 0.5 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
+dalla v0.1 in poi; la v0.5 introduce i punti espliciti per le bombe e il
+budget di 8 punti. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
 I punti ancora aperti sono marcati **[DA DECIDERE]**. Le regole superate sono
 conservate in fondo, nella sezione storica.
 
@@ -56,26 +57,29 @@ conservate in fondo, nella sezione storica.
 - **3.1 Numero:** al massimo **6 bombe** per mazzo, sulle 75 (per ora).
 - **3.2 Copia singola:** ogni bomba si mette **una volta sola**.
 - **3.3 Forza:** le bombe pagano i punti della Lista Punti come tutte le altre
-  carte (regola 4), compreso il sovrapprezzo automatico della regola 4.4.
+  carte (regola 4): quelle in lista il loro valore, le altre il minimo
+  automatico della regola 4.4.
 
 ## 4. Lista Punti: il power level
 
 Il prezzo non è più un parametro. La forza si misura con una lista curata,
 sul modello del Canadian Highlander.
 
-- **4.1 Budget:** ogni mazzo ha **7 punti** sulle 75. **[DA DECIDERE]**:
-  budget e sovrapprezzo (4.4) si tarano sul mazzo di Fede, poi si cerca una
-  quadra con il gruppo.
+- **4.1 Budget:** ogni mazzo ha **8 punti** sulle 75. Tarato sul mazzo di
+  Fede: la sua prima configurazione completa vale esattamente 8. Il gruppo
+  può rivederlo dopo le prime serate.
 - **4.2 Costo:** ogni copia di una carta in lista costa i punti indicati,
   classica o moderna che sia. **Le carte che non sono in lista costano 0.**
   I punti non si spalmano sulle 40 non-terre: la lista contiene solo le
   carte più forti del formato (qualche decina), e il budget decide quante
   di queste si possono mettere. Il resto del mazzo è libero.
-  - *Esempio, mono verde:* 2 Sylvan Library (2) + 1 Natural Order (2) +
-    1 Tutore Terreno (1) + 2 bombe mitiche (1 + 1) = **7 punti**.
-    (Esempio della v0.3; con la v0.4 vale ancora: sono tutte non-creature.) Le altre
-    ~34 non-terre (Ancient Ooze, Ravenous Baloth, Forgotten Ancient, ecc.)
-    costano 0.
+  - *Esempio, mono verde (v0.5):* Gaea's Cradle (3) + Sylvan Library (1) +
+    Thrun, Breaker of Silence (1) + Primeval Titan (1) + Vorinclex (1) +
+    Hexhaven Invigorator (1) = **8 punti**: è la prima configurazione di Fede.
+    Le altre ~30 non-terre (Ancient Ooze, Ravenous Baloth, Forgotten Ancient,
+    ecc.) costano 0.
+  - *Esempio storico della v0.3:* 2 Sylvan Library (2) + 1 Natural Order (2)
+    + 1 Tutore Terreno (1) + 2 bombe mitiche (1 + 1) = 7 punti.
   - In pratica il budget obbliga a scegliere: o due-tre carte fortissime,
     o tante carte "buone ma non rotte".
 - **4.3 Chi tiene la lista:** la lista è una sola, in questo documento. Una
@@ -84,15 +88,18 @@ sul modello del Canadian Highlander.
   può ribaltare la decisione a maggioranza. Una volta scritta, *quella è e
   ci si fida*. Dopo ogni serata si annota cosa ha rotto il gioco e la lista
   si aggiorna.
-- **4.4 Sovrapprezzo automatico delle bombe** (sostituisce il test del
-  gemello della v0.1): **[DA DECIDERE]**
-  - una bomba di rarità **mitica** costa **almeno 1 punto**;
-  - una carta stampata per la prima volta in un set **Modern Horizons**
-    costa **almeno 1 punto**;
-  - se la carta è già in lista, vale il valore della lista, se più alto.
-    I due sovrapprezzi non si sommano.
-  - Motivo: sono i due indicatori oggettivi più legati alla crescita di
-    potenza delle carte moderne, e si controllano in un secondo.
+- **4.4 Bombe: valore esplicito e minimo automatico** (v0.5):
+  - le bombe valutate sono nella **Lista Punti delle bombe** qui sotto:
+    **2** punti per quelle che decidono la partita da sole, **1** per quelle
+    forti, **0** per quelle oneste (una bomba a 0 occupa comunque uno dei
+    6 posti);
+  - una bomba **non in lista** di rarità **mitica**, o stampata per la prima
+    volta in un set **Modern Horizons**, costa **almeno 1 punto**; i due
+    minimi non si sommano;
+  - una bomba non in lista e non mitica costa 0 finché chi cura la lista non
+    la valuta (regola 4.3). Il deck builder la segnala come "da valutare".
+  - Motivo: il solo sovrapprezzo per rarità lasciava a 0 carte fortissime
+    come Thrun, Breaker of Silence (rara).
 - **4.5 Criterio per chi cura la lista** (non è una regola per i giocatori):
   una creatura è sospetta se ha forza + costituzione superiore a
   2 × costo di mana + 1 e in più un'abilità utile, oppure se genera vantaggio
@@ -105,6 +112,18 @@ sul modello del Canadian Highlander.
 | 3 | Anello Solare (Sol Ring), Balance (Bilancino), Tutore Demoniaco (Demonic Tutor), Survival of the Fittest, Show and Tell, Force of Will, Jitte di Umezawa (Umezawa's Jitte), Gaea's Cradle |
 | 2 | Tutore Vampirico (Vampiric Tutor), Cappa delle Profezie Sensei (Sensei's Divining Top), Strip Mine, Wasteland, Armageddon, Fossato (Moat), Crogiolo dei Mondi (Crucible of Worlds), Scettro Isocrono (Isochron Scepter), Natural Order, Hymn to Tourach, Land Tax, Opposition, Winter Orb, Orcish Bowmasters, Sheoldred, the Apocalypse |
 | 1 | Tutore Illuminato (Enlightened Tutor), Tutore Terreno (Worldly Tutor), Manipolatore Glaciale (Icy Manipulator), Swords to Plowshares, Sylvan Library, Brainstorm, Dark Ritual, Thoughtseize, Fatal Push |
+
+### Lista Punti delle bombe (v0.5, 2026-11-12)
+
+Valutate finora le bombe verdi e incolori del mazzo di Fede e delle sue
+configurazioni. Le bombe degli altri colori si aggiungono quando gli amici
+le propongono.
+
+| Punti | Bombe |
+| --- | --- |
+| 2 | Craterhoof Behemoth, Hornet Queen, Avenger of Zendikar, Wurmcoil Engine, Questing Beast, Elder Gargaroth, Birthing Pod |
+| 1 | Thrun, Breaker of Silence; Thrun, the Last Troll; Carnage Tyrant; Tarmogoyf; Thragtusk; Tireless Tracker; Polukranos, World Eater; Master of the Wild Hunt; Vengevine; Primeval Titan; Vorinclex; Kalonian Hydra; Rampaging Baloths; Lotus Cobra; Old Gnawbone; Terastodon; Ghalta, Primal Hunger; Hexhaven Invigorator; Voracious Hydra; Ancient Greenwarden |
+| 0 | Beast Within, Acidic Slime, Obstinate Baloth, Heroic Intervention, Courser of Kruphix, Scavenging Ooze, Pelakka Wurm, Wolfir Silverheart, Territorial Allosaurus, Vigor, Hardened Scales |
 
 ## 5. Carte e mazzi vietati
 
@@ -197,7 +216,21 @@ sul modello del Canadian Highlander.
 - Si costruisce un deck builder collegato a Scryfall, da condividere con gli
   amici: [deck_builder.html](deck_builder.html).
 
+## Decisioni di Fede (2026-11-12, sulla proposta di taratura)
+
+- Approvata la taratura v0.5: punti espliciti per le bombe (2/1/0), minimo
+  di 1 punto per le mitiche e le Modern Horizons non in lista, budget 8.
+  Analisi di partenza: `Possibili Configurazioni/2026_11_12_bombe_e_configurazioni.html`.
+
 ## Sezione storica
+
+### Regole della v0.4 superate dalla v0.5
+
+- *4.1 v0.4 — Budget di 7 punti [DA DECIDERE]:* ora 8.
+- *4.4 v0.4 — Sovrapprezzo automatico [DA DECIDERE]:* una bomba mitica o
+  Modern Horizons costava almeno 1 punto, tutte le altre 0. Ora le bombe
+  hanno un valore esplicito in lista; il minimo automatico resta solo per
+  le bombe non ancora in lista.
 
 ### Regole della v0.3 superate dalla v0.4
 
