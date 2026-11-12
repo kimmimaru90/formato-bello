@@ -1,9 +1,10 @@
 # Formato Bello — Regolamento
 
-**Versione 0.7 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
+**Versione 0.8 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
 dalla v0.1 in poi; la v0.6 ha introdotto il comandante (sezione 8) e la copia
-singola per tutte le carte, la v0.7 fissa i comandanti vietati e toglie il
-danno da comandante. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
+singola per tutte le carte, la v0.7 ha fissato i comandanti vietati e tolto il
+danno da comandante, la v0.8 ammette come comandante anche le creature non
+leggendarie. Fonte originale: il PDF "Formato Bello Rulings" scritto da Fede.
 I punti ancora aperti sono marcati **[DA DECIDERE]**. Le regole superate sono
 conservate in fondo, nella sezione storica.
 
@@ -174,9 +175,10 @@ le propongono.
 Proposto dagli amici di Fede al primo confronto. Si usano le meccaniche di
 Commander, adattate a un mazzo da 60 carte.
 
-- **8.1 Chi può esserlo:** una **creatura leggendaria classica** (regola 2.1,
-  quindi mai una bomba), del **colore del mazzo**: la sua identità di colore
-  è esattamente quel colore. Il comandante fa parte delle 60 carte.
+- **8.1 Chi può esserlo:** una **creatura classica**, leggendaria o no
+  (regola 2.1, quindi mai una bomba), del **colore del mazzo**: la sua
+  identità di colore è esattamente quel colore. Il comandante fa parte delle
+  60 carte.
 - **8.2 Zona di comando:** a inizio partita il comandante è nella zona di
   comando e da lì si può lanciare. Ogni volta che lo lanci dalla zona di
   comando costa **{2} in più per ogni volta che l'hai già lanciato da lì**
@@ -201,6 +203,10 @@ Commander, adattate a un mazzo da 60 carte.
       Eight-and-a-Half-Tails (protezioni ripetute), Multani, Maro-Sorcerer
       (enorme e intoccabile), Azusa, Lost but Seeking (due terre in più a
       turno);
+    - creature non leggendarie che da comandante, cioè sempre disponibili,
+      diventano un motore ripetibile (v0.8): Royal Assassin, Prodigal
+      Sorcerer, Grim Lavamancer, Mother of Runes, Archivist, Flametongue
+      Kavu, Nekrataal, Master Decoy;
   - un comandante con un'abilità che si ripete ogni turno e rimuove,
     ruba o fa pescare va **presentato al gruppo** prima della serata.
 - **8.4 Danno da comandante: non si usa.** In Commander si perde con 21 danni
@@ -277,8 +283,17 @@ Commander, adattate a un mazzo da 60 carte.
   presentare al gruppo Godo, Kokusho, Eight-and-a-Half-Tails, Multani e Azusa.
   Correzione di Fede, stesso giorno: anche questi ultimi cinque sono
   **vietati** come comandante (17 in tutto).
+- Il comandante può essere anche una creatura non leggendaria (v0.8).
+- Vietati come comandante anche Royal Assassin, Prodigal Sorcerer, Grim
+  Lavamancer, Mother of Runes, Archivist, Flametongue Kavu, Nekrataal e
+  Master Decoy (25 in tutto); altri si valuteranno dopo le prime partite.
 
 ## Sezione storica
+
+### Regole della v0.7 superate dalla v0.8
+
+- *8.1 v0.7 — Il comandante è una creatura leggendaria classica:* ora basta
+  una creatura classica, leggendaria o no.
 
 ### Regole della v0.6 superate dalla v0.7
 
