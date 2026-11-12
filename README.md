@@ -19,9 +19,9 @@ qualche carta moderna in dosi controllate.
   2 copie, terre base libere.
 - **Bombe:** al massimo 6 carte moderne (uscite dopo Liberatori), una copia
   ciascuna.
-- **Lista Punti:** le carte più forti costano punti; ogni mazzo ne ha 7
-  (valore provvisorio). Le bombe mitiche o dei set Modern Horizons costano
-  almeno 1 punto.
+- **Lista Punti:** le carte più forti costano punti; ogni mazzo ne ha **8**.
+  Anche le bombe hanno il loro valore (2, 1 o 0); quelle non ancora
+  valutate costano almeno 1 punto se sono mitiche o dei set Modern Horizons.
 - **Vietati:** planeswalker, combo che vincono in un turno, carte "vinci la
   partita", posta, set burloni, compagni e la banlist del regolamento.
 - **Mazzo:** almeno 60 carte, sideboard fino a 15. Si gioca con le proxy,
