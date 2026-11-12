@@ -286,9 +286,10 @@ const BANNED_COMMANDERS = ["Rofellos, Llanowar Emissary", "Erayo, Soratami Ascen
   // i cinque leggendari simbolo, uno per colore (v0.7)
   "Jareth, Leonine Titan", "Arcanis the Omnipotent", "Visara the Dreadful", "Rorix Bladewing", "Silvos, Rogue Elemental",
   // troppo forti o poco divertenti da comandante (v0.7)
-  "Meloku the Clouded Mirror", "Hokori, Dust Drinker", "Memnarch"];
-const APPROVE_COMMANDERS = ["Godo, Bandit Warlord", "Kokusho, the Evening Star", "Eight-and-a-Half-Tails",
+  "Meloku the Clouded Mirror", "Hokori, Dust Drinker", "Memnarch",
+  "Godo, Bandit Warlord", "Kokusho, the Evening Star", "Eight-and-a-Half-Tails",
   "Multani, Maro-Sorcerer", "Azusa, Lost but Seeking"];
+const APPROVE_COMMANDERS = [];
 const BANNED_SET = new Set(BANNED.map(n => n.toLowerCase()));
 const POINTS_MAP = new Map();
 for (const list of [POINTS, BOMB_POINTS])
