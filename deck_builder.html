@@ -6,8 +6,8 @@
 <meta name="color-scheme" content="dark">
 <title>Formato Bello — Deck Builder</title>
 <!--
-  Formato Bello — Deck Builder (v0.4, 2026-11-12)
-  Regole e Lista Punti dal regolamento del Formato Bello v0.5: se il
+  Formato Bello — Deck Builder (v0.5, 2026-11-12)
+  Regole e Lista Punti dal regolamento del Formato Bello v0.7: se il
   regolamento cambia, aggiornare la sezione RULES qui sotto.
   Dati, immagini e simboli di mana: API pubblica di Scryfall (serve Internet).
   Non affiliato a Wizards of the Coast né a Scryfall.
@@ -167,7 +167,30 @@ input[type=text]::placeholder { color: #6f8aa5; }
 .toast.warn { background: var(--yellow); color: #1a1300; }
 .searchrow.hidden { display: none; }
 .optrow { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+.ptb { position: absolute; top: 6px; left: 6px; z-index: 2; background: var(--yellow); color: #1a1300; font-weight: 800;
+  font-size: 12px; padding: 2px 8px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,.55); pointer-events: none; }
+.ptb.zero { background: rgba(10, 20, 34, .9); color: var(--yellow); border: 1px solid var(--yellow); }
+.ptb.bl { top: auto; bottom: 6px; }
+.muted { color: var(--muted); }
+.eyebrow { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.cmdpick { display: grid; grid-template-columns: minmax(0, 220px) 1fr; gap: 18px; align-items: start; }
+.cmdinfo h3 { margin: 0 0 4px; font-family: "Cinzel", Georgia, serif; color: var(--yellow-soft); font-size: 22px; }
+.cmdinfo p { margin: 0 0 8px; }
+.cmdbar { display: flex; gap: 14px; align-items: center; padding: 10px; border: 1px solid rgba(242, 183, 5, .45);
+  border-radius: 12px; background: rgba(242, 183, 5, .06); }
+.cmdbar > img, .cmdbar > .noimg { width: 74px; border-radius: 6px; flex: none; }
+.cmdbar b { font-size: 17px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; padding: 8px 12px; border: 0; background: var(--input); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--teal); color: var(--bg-1); font-weight: 600; }
+.draftbtn.on { border-color: var(--yellow); color: var(--yellow); }
+.draftpanel { border-color: rgba(242, 183, 5, .55); }
+h4.grp { margin: 14px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--aqua); }
+.landrow { display: flex; gap: 12px; flex-wrap: wrap; }
+.landchip { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: rgba(15, 33, 49, .6); }
+.landchip > img, .landchip > .noimg { width: 52px; border-radius: 4px; }
 @media (max-width: 760px) {
+  .cmdpick { grid-template-columns: minmax(0, 140px) 1fr; }
   .steps { margin-left: 0; }
   .colors { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
   .color { padding: 10px 2px; } .color img { width: 40px; height: 40px; margin-bottom: 6px; } .color span { font-size: 12px; }
@@ -183,7 +206,7 @@ input[type=text]::placeholder { color: #6f8aa5; }
 <body>
 <header class="top">
   <div class="top-inner">
-    <h1 class="brand">Formato Bello<small>Deck builder · da Alpha a Liberatori di Kamigawa</small></h1>
+    <h1 class="brand">Formato Bello<small>Deck builder · comandante · da Alpha a Liberatori di Kamigawa</small></h1>
     <nav class="steps" id="steps"></nav>
   </div>
 </header>
@@ -205,17 +228,14 @@ input[type=text]::placeholder { color: #6f8aa5; }
 
 <script>
 "use strict";
-// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.5)
+// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.7)
 const RULES = {
-  version: "0.5",
+  version: "0.7",
   cutoff: "2005-06-03",           // Liberatori di Kamigawa (Saviors of Kamigawa)
-  deckSize: 60,
-  lands: 23,
-  pickedCreatures: 10,
-  draftRounds: 10,
-  maxBombs: 6,
-  budget: 8,                      // regola 4.1 v0.5
-  maxNonCreature: 2,
+  deckSize: 60,                   // comandante compreso (1.1)
+  lands: 23,                      // punto di partenza (1.5)
+  maxBombs: 6,                    // 3.1
+  budget: 8,                      // 4.1
   mhSets: ["mh1", "mh2", "mh3", "h1r"],
 };
 const COLORS = {
@@ -249,7 +269,7 @@ const BANNED = ["Amulet of Quoz", "Ancestral Recall", "Bazaar of Baghdad", "Blac
   "Solitude", "Grief", "Fury", "Endurance", "Subtlety", "Ragavan, Nimble Pilferer",
   "Oko, Thief of Crowns", "Uro, Titan of Road and Sea", "Dockside Extortionist",
   "Hogaak, Arisen Necropolis", "Murktide Regent"];
-// Lista Punti delle bombe (regola 4.4 v0.5): valore esplicito; le bombe non in lista hanno solo il minimo automatico
+// Lista Punti delle bombe (regola 4.4): valore esplicito; le bombe non in lista hanno solo il minimo automatico
 const BOMB_POINTS = {
   2: ["Craterhoof Behemoth", "Hornet Queen", "Avenger of Zendikar", "Wurmcoil Engine", "Questing Beast",
       "Elder Gargaroth", "Birthing Pod"],
@@ -260,24 +280,49 @@ const BOMB_POINTS = {
   0: ["Beast Within", "Acidic Slime", "Obstinate Baloth", "Heroic Intervention", "Courser of Kruphix",
       "Scavenging Ooze", "Pelakka Wurm", "Wolfir Silverheart", "Territorial Allosaurus", "Vigor", "Hardened Scales"],
 };
+// Comandante (regola 8.3): vietati come comandante, ma giocabili nel mazzo
+const BANNED_COMMANDERS = ["Rofellos, Llanowar Emissary", "Erayo, Soratami Ascendant",
+  "Kiki-Jiki, Mirror Breaker", "Braids, Cabal Minion",
+  // i cinque leggendari simbolo, uno per colore (v0.7)
+  "Jareth, Leonine Titan", "Arcanis the Omnipotent", "Visara the Dreadful", "Rorix Bladewing", "Silvos, Rogue Elemental",
+  // troppo forti o poco divertenti da comandante (v0.7)
+  "Meloku the Clouded Mirror", "Hokori, Dust Drinker", "Memnarch"];
+const APPROVE_COMMANDERS = ["Godo, Bandit Warlord", "Kokusho, the Evening Star", "Eight-and-a-Half-Tails",
+  "Multani, Maro-Sorcerer", "Azusa, Lost but Seeking"];
 const BANNED_SET = new Set(BANNED.map(n => n.toLowerCase()));
 const POINTS_MAP = new Map();
 for (const list of [POINTS, BOMB_POINTS])
   for (const [p, names] of Object.entries(list)) for (const n of names) POINTS_MAP.set(n.toLowerCase(), +p);
+const front = name => name.split(" // ")[0];
 const SYMBOL_URL = s => `https://svgs.scryfall.io/card-symbols/${s.replace(/\//g, "")}.svg`;
 
 // ---------------------------------------------------------------- STATE
-const STORE_KEY = "formatoBelloDeck.v1";
-const STEPS = ["Colore", "Le tue 10 creature", "Draft", "Bombe", "Mazzo"];
+const STORE_KEY = "formatoBelloDeck.v2", OLD_KEY = "formatoBelloDeck.v1";
+const STEPS = ["Colore", "Comandante", "Mazzo"];
 let S = freshState();
 function freshState() {
-  return { player: "", color: null, step: 0, picked: [], draft: [], draftShown: [], bombs: [],
-           extra: [], lands: [], draftPack: null };
+  return { player: "", color: null, step: 0, commander: null, cards: [], lands: [],
+           draftOn: false, draftShown: [], draftPack: null, view: "carte" };
+}
+// Mazzi del deck builder v0.4 e precedenti (10 creature, draft, bombe, aggiunte): tutto finisce tra le carte.
+function migrate(o) {
+  if (!o || o.cards) return Object.assign(freshState(), o || {});
+  const n = freshState();
+  n.player = o.player || ""; n.color = o.color || null; n.draftShown = o.draftShown || [];
+  n.cards = [...(o.picked || []), ...(o.draft || []), ...(o.bombs || [])].map(c => ({ ...c, qty: 1 }))
+    .concat((o.extra || []).map(c => ({ ...c, qty: c.qty || 1 })));
+  n.lands = o.lands || [];
+  n.step = n.color ? 1 : 0;
+  return n;
 }
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
 function load() {
-  try { const raw = localStorage.getItem(STORE_KEY); if (raw) S = Object.assign(freshState(), JSON.parse(raw)); }
-  catch (e) {}
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) { S = migrate(JSON.parse(raw)); return; }
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) { S = migrate(JSON.parse(old)); save(); }
+  } catch (e) {}
 }
 
 // ---------------------------------------------------------------- SCRYFALL
@@ -306,10 +351,11 @@ function toCard(c, itName) {
     oracle_id: c.oracle_id, name: c.name, it: itName || "", type, cmc: c.cmc || 0,
     mana: c.mana_cost || (face && face.mana_cost) || "", rarity: c.rarity,
     set: c.set, first_set: c.set, set_name: c.set_name, number: c.collector_number, released: c.released_at,
-    lang: c.lang || "en",
+    lang: c.lang || "en", ci: (c.color_identity || []).join(""),
     img, back, uri: c.scryfall_uri, oracle, set_type: c.set_type,
     creature: /\bCreature\b/.test(type), land: /\bLand\b/.test(type),
     basic: /\bBasic\b/.test(type) && /\bLand\b/.test(type),
+    legendary: /\bLegendary\b/.test(type.split(" // ")[0]),
     bomb: c.released_at > RULES.cutoff,
   };
 }
@@ -346,24 +392,25 @@ async function searchByName(text, filters, era) {
   };
   return [...found.values()].sort((a, b) => score(a) - score(b)).map(c => toCard(c, itNames.get(c.name)));
 }
+// Quando una ricerca non trova nulla: la carta esiste ma è di un altro colore, o non esiste proprio?
+async function whyNone(text) {
+  const terms = nameTerms(text);
+  const [en, it] = await Promise.all([search(`${terms} ${BASE}`), sf("/cards/search", { q: `${terms} lang:it`, unique: "cards" })]);
+  const names = [...new Set([...en.data, ...it.data].map(c => c.name))];
+  return names;
+}
 
 // ---------------------------------------------------------------- DECK LOGIC
 function allCards() {
-  return [...S.picked.map(c => ({ ...c, qty: 1, src: "scelta" })),
-          ...S.draft.map(c => ({ ...c, qty: 1, src: "draft" })),
-          ...S.bombs.map(c => ({ ...c, qty: 1, src: "bomba" })),
-          ...S.extra.map(c => ({ ...c, src: "aggiunta" })),
+  return [...(S.commander ? [{ ...S.commander, qty: 1, src: "comandante" }] : []),
+          ...S.cards.map(c => ({ ...c, qty: c.qty || 1, src: "carta" })),
           ...S.lands.map(c => ({ ...c, src: "terra" }))];
 }
 function inDeck(name) { return allCards().some(c => c.name === name); }
 function qtyInDeck(name) { return allCards().filter(c => c.name === name).reduce((a, c) => a + c.qty, 0); }
 function total() { return allCards().reduce((a, c) => a + c.qty, 0); }
 function bombCount() { return allCards().filter(c => c.bomb).reduce((a, c) => a + c.qty, 0); }
-function maxCopies(c) {
-  if (c.basic) return 99;
-  if (c.creature || c.bomb) return 1;
-  return RULES.maxNonCreature;
-}
+function maxCopies(c) { return c.basic ? 99 : 1; }   // 1.2: copia singola, terre base libere
 function points(c) {
   const key = c.name.toLowerCase();
   const listed = POINTS_MAP.has(key);
@@ -387,16 +434,45 @@ function problems(c) {
 function needsApproval(c) {
   return /protection from/i.test(c.oracle) || /^Circle of Protection/.test(c.name) || /^Sword of /.test(c.name);
 }
+// Il comandante (8.1, 8.3): ritorna il motivo per cui non va bene, oppure ""
+function commanderProblem(c) {
+  if (!c) return "Manca il comandante";
+  if (!c.legendary || !c.creature) return "Non è una creatura leggendaria";
+  if (c.bomb) return "Uscito dopo Liberatori di Kamigawa: il comandante deve essere classico";
+  if (c.ci && c.ci !== S.color) return "Non è del colore del mazzo";
+  if (BANNED_COMMANDERS.includes(front(c.name))) return "Vietato come comandante (8.3)";
+  const p = problems(c);
+  if (p.length) return "Vietato: " + p.join(", ");
+  return "";
+}
 function blockReason(c, opts) {
   opts = opts || {};
+  if (opts.commander) {
+    const why = commanderProblem(c);
+    return why === "Manca il comandante" ? "" : why;
+  }
   const p = problems(c);
   if (p.length) return "Vietata: " + p.join(", ");
-  if (!c.basic && inDeck(c.name) && maxCopies(c) === 1) return "Già nel mazzo";
-  if (!c.basic && qtyInDeck(c.name) >= maxCopies(c)) return `Già ${maxCopies(c)} copie nel mazzo`;
-  if (opts.classicOnly && c.bomb) return "Uscita dopo Liberatori di Kamigawa";
-  if (opts.bombOnly && !c.bomb) return "Classica: aggiungila nel mazzo";
+  if (S.commander && c.name === S.commander.name) return "È il tuo comandante";
+  if (!c.basic && inDeck(c.name)) return "Già nel mazzo (copia singola)";
   if (c.bomb && bombCount() >= RULES.maxBombs) return `Hai già ${RULES.maxBombs} bombe`;
   return "";
+}
+function addCard(c) {
+  if (c.basic) {
+    const l = S.lands.find(x => x.name === c.name);
+    if (l) l.qty++; else S.lands.push({ ...c, qty: 1 });
+  } else {
+    if (inDeck(c.name)) return false;
+    S.cards.push({ ...c, qty: 1 });
+  }
+  save(); return true;
+}
+// Toglie una copia (i mazzi importati da versioni vecchie possono averne 2); all'ultima toglie la carta
+function removeCard(name) {
+  const i = S.cards.findIndex(c => c.name === name);
+  if (i >= 0) { if ((S.cards[i].qty || 1) > 1) S.cards[i].qty--; else S.cards.splice(i, 1); }
+  save(); render();
 }
 
 // ---------------------------------------------------------------- RENDER helpers
@@ -446,6 +522,13 @@ function cardImg(c) {
   if (c.img) return el("img", { src: c.img, alt: c.name, loading: "lazy" });
   return el("div", { class: "noimg" }, c.name);
 }
+// Punti e bomba scritti sulla carta, così si vede subito quanto costa
+function ptBadge(c, cls) {
+  const pt = points(c);
+  if (!pt.p && !c.bomb) return null;
+  const txt = [c.bomb ? "Bomba" : "", pt.p ? `${pt.p} pt${pt.auto ? " auto" : ""}` : (c.bomb && pt.listed ? "0 pt" : "")].filter(Boolean).join(" · ");
+  return el("span", { class: "ptb" + (pt.p ? "" : " zero") + (cls ? " " + cls : ""), title: pt.listed || !c.bomb ? "Punti della Lista Punti" : "Bomba non ancora valutata" }, txt);
+}
 // Bottoni sopra una carta già scelta: girare la carta (se ha il retro) e cambiare immagine
 function cardControls(c, holder) {
   const out = [];
@@ -480,21 +563,19 @@ function toast(text, warn) {
 }
 function filledSlot(c, onRemove) {
   const s = el("div", { class: "slot filled" }, cardImg(c));
-  s.append(...cardControls(c, s), el("button", { class: "x", title: "Togli", onclick: onRemove }, "×"));
+  s.append(...cardControls(c, s), ptBadge(c, "bl") || "");
+  if (onRemove) s.append(el("button", { class: "x", title: "Togli", onclick: onRemove }, "×"));
   hoverPreview(s, c);
   return s;
 }
 function stepAllowed(i) {
   if (i === 0) return true;
   if (!S.color) return false;
-  if (i >= 2 && S.picked.length < RULES.pickedCreatures) return false;
-  if (i >= 3 && S.draft.length < RULES.draftRounds) return false;
+  if (i >= 2 && !S.commander) return false;
   return true;
 }
-function stepDone(i) {
-  return [!!S.color, S.picked.length >= RULES.pickedCreatures, S.draft.length >= RULES.draftRounds, S.bombs.length > 0, total() >= RULES.deckSize][i];
-}
-function go(i) { if (!stepAllowed(i)) return; S.step = i; if (i === 4) ensureLands(); save(); render(); scrollTo(0, 0); }
+function stepDone(i) { return [!!S.color, !!S.commander && !commanderProblem(S.commander), total() >= RULES.deckSize][i]; }
+function go(i) { if (!stepAllowed(i)) return; S.step = i; if (i === 2) ensureLands(); save(); render(); scrollTo(0, 0); }
 
 function render() {
   hidePreview();
@@ -503,10 +584,10 @@ function render() {
     class: S.step === i ? "on" : stepDone(i) ? "done" : "", disabled: !stepAllowed(i), onclick: () => go(i)
   }, `${i + 1}. ${name}`)));
   const v = $("view"); v.textContent = "";
-  [viewColor, viewPicked, viewDraft, viewBombs, viewDeck][S.step](v);
+  [viewColor, viewCommander, viewDeck][Math.min(S.step, 2)](v);
 }
 
-// ---------------------------------------------------------------- STEP 1: colore
+// ---------------------------------------------------------------- PASSO 1: colore
 function viewColor(v) {
   const p = el("section", { class: "panel" },
     ptitle("Chi sei e che colore giochi?", null, "Il mazzo è mono colore: tutte le carte devono essere del colore scelto, più eventuali carte incolori (artefatti e terre). Ogni giocatore ha un colore suo."));
@@ -516,7 +597,7 @@ function viewColor(v) {
   const grid = el("div", { class: "colors" });
   for (const [k, c] of Object.entries(COLORS)) {
     grid.append(el("button", { class: "color" + (S.color === k ? " on" : ""), style: { "--glow": c.glow }, title: c.name, onclick: () => {
-      if (S.color && S.color !== k && (S.picked.length || S.draft.length || S.extra.length || S.bombs.length) &&
+      if (S.color && S.color !== k && (S.commander || S.cards.length) &&
           !confirm("Cambiando colore si svuota il mazzo. Continuare?")) return;
       if (S.color !== k) { const pl = S.player; S = freshState(); S.player = pl; }
       S.color = k; save(); render();
@@ -524,139 +605,73 @@ function viewColor(v) {
   }
   p.append(grid);
   p.append(el("div", { class: "row", style: "margin-top:18px" },
-    el("button", { class: "btn", disabled: !S.color, onclick: () => go(1) }, "Avanti: le tue 10 creature")));
+    el("button", { class: "btn", disabled: !S.color, onclick: () => go(1) }, "Avanti: scegli il comandante")));
   v.append(p);
   v.append(el("section", { class: "panel" },
-    ptitle("Riprendi un mazzo esportato", null, "Carica il file .json esportato in precedenza da questo deck builder: riparti dal mazzo così com'era."),
+    ptitle("Riprendi un mazzo esportato", null, "Carica il file .json esportato in precedenza da questo deck builder, anche da una versione vecchia: riparti dal mazzo così com'era."),
     importButton()));
 }
 
-// ---------------------------------------------------------------- STEP 2: 10 creature scelte
-function viewPicked(v) {
+// ---------------------------------------------------------------- PASSO 2: comandante
+function commanderSearchOpts() {
+  return {
+    title: "Scegli il comandante", commander: true,
+    filters: `id=${S.color.toLowerCase()} t:legendary t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
+    onPick: c => { S.commander = c; save(); render(); return true; },
+  };
+}
+let cmdSuggest = null, cmdSuggestColor = null;
+function viewCommander(v) {
   const col = COLORS[S.color];
   const p = el("section", { class: "panel" },
-    ptitle("Le tue creature", `${S.picked.length}/${RULES.pickedCreatures}`,
-      `Clicca su un "+" e cerca una creatura ${col.name.toLowerCase()} con almeno una stampa entro Liberatori di Kamigawa. Puoi scrivere il nome in italiano o in inglese, anche solo una parte. Niente bombe qui; ogni creatura una volta sola.`));
-  const grid = el("div", { class: "slots" });
-  for (let i = 0; i < RULES.pickedCreatures; i++) {
-    const c = S.picked[i];
-    if (c) {
-      grid.append(filledSlot(c, () => { S.picked.splice(i, 1); save(); render(); }));
-    } else {
-      grid.append(el("button", { class: "slot", title: "Aggiungi creatura", onclick: () => openSearch({
-        title: "Scegli una creatura",
-        filters: `id=${S.color.toLowerCase()} t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
-        onPick: c => { S.picked.push(c); save(); render(); return true; }
-      }) }, "+"));
-    }
+    ptitle("Il comandante", null,
+      `Una creatura leggendaria ${col.name.toLowerCase()} uscita entro Liberatori di Kamigawa. Comincia la partita nella zona di comando e da lì la puoi lanciare quando vuoi; ogni volta che la rilanci costa {2} in più. Se va nel cimitero o in esilio puoi rimetterla nella zona di comando. Alcuni comandanti troppo forti sono vietati (regola 8.3).`));
+  const row = el("div", { class: "cmdpick" });
+  if (S.commander) {
+    const why = commanderProblem(S.commander);
+    row.append(filledSlot(S.commander, () => { S.commander = null; save(); render(); }));
+    const info = el("div", { class: "cmdinfo" },
+      el("h3", {}, S.commander.it || S.commander.name),
+      S.commander.it && S.commander.it !== S.commander.name ? el("p", { class: "muted" }, S.commander.name) : null,
+      el("p", {}, manaCost(S.commander.mana), " ", S.commander.type),
+      why ? el("p", { class: "bad" }, "✗ " + why) : el("p", { class: "ok" }, "✓ Comandante valido"),
+      APPROVE_COMMANDERS.includes(front(S.commander.name)) ? el("p", { class: "warn" }, "! Va presentato al gruppo prima della serata (8.3).") : null,
+      el("div", { class: "row" },
+        el("button", { class: "btn ghost", onclick: () => openSearch(commanderSearchOpts()) }, "Cambia comandante"),
+        el("button", { class: "btn", disabled: !!why, onclick: () => go(2) }, "Avanti: il mazzo")));
+    row.append(info);
+  } else {
+    row.append(el("button", { class: "slot", title: "Cerca il comandante", onclick: () => openSearch(commanderSearchOpts()) }, "+"));
+    row.append(el("div", { class: "cmdinfo" },
+      el("h3", {}, "Nessun comandante"),
+      el("p", { class: "muted" }, "Clicca sul + per cercarlo per nome, oppure scegline uno qui sotto."),
+      el("div", { class: "row" }, el("button", { class: "btn ghost", onclick: () => go(0) }, "Indietro"))));
   }
-  p.append(grid);
-  p.append(el("div", { class: "row", style: "margin-top:18px" },
-    el("button", { class: "btn ghost", onclick: () => go(0) }, "Indietro"),
-    el("button", { class: "btn", disabled: S.picked.length < RULES.pickedCreatures, onclick: () => go(2) }, "Avanti: draft")));
+  p.append(row);
   v.append(p);
+  // Suggerimenti: i comandanti classici più giocati del colore
+  const sp = el("section", { class: "panel" }, ptitle("I più giocati del tuo colore", null, "Creature leggendarie classiche del tuo colore, ordinate per popolarità su Scryfall (classifica EDHREC). Quelle vietate come comandante non compaiono."));
+  const grid = el("div", { class: "cards" });
+  const st = el("div", { class: "status" }, "Carico…");
+  sp.append(st, grid);
+  v.append(sp);
+  const fill = () => {
+    st.textContent = "";
+    for (const c of cmdSuggest.slice(0, 18)) {
+      const current = S.commander && S.commander.name === c.name;
+      const n = el("button", { class: "card" + (current ? " current" : ""), title: c.name, onclick: () => { S.commander = c; save(); render(); toast(`✓ Comandante: ${c.name}`); } },
+        cardImg(c), ptBadge(c), el("span", { class: "tag" }, c.name));
+      hoverPreview(n, c); grid.append(n);
+    }
+  };
+  if (cmdSuggest && cmdSuggestColor === S.color) fill();
+  else search(`id=${S.color.toLowerCase()} t:legendary t:creature date<=${RULES.cutoff} ${BASE}`).then(r => {
+    cmdSuggest = r.data.map(c => toCard(c)).filter(c => !commanderProblem(c)); cmdSuggestColor = S.color;
+    if (S.step === 1) fill();
+  }).catch(e => { st.textContent = "Errore nel caricare i suggerimenti: " + e.message; });
 }
 
-// ---------------------------------------------------------------- STEP 3: draft
-let pool = null, poolColor = null;
-async function loadPool() {
-  if (pool && poolColor === S.color) return pool;
-  const q = `id=${S.color.toLowerCase()} t:creature date<=${RULES.cutoff} ${BASE}`;
-  const first = await search(q);
-  let data = first.data;
-  if (first.has_more && first.next_page) {
-    const u = new URL(first.next_page);
-    const second = await sf(u.pathname, Object.fromEntries(u.searchParams));
-    data = data.concat(second.data);
-  }
-  pool = data.map(c => toCard(c)).filter(c => !c.bomb && !problems(c).length);
-  poolColor = S.color;
-  return pool;
-}
-function makePack() {
-  const used = new Set([...S.picked, ...S.draft].map(c => c.name).concat(S.draftShown));
-  const avail = pool.filter(c => !used.has(c.name));
-  const bands = [c => c.cmc <= 2, c => c.cmc >= 3 && c.cmc <= 4, c => c.cmc >= 5];
-  const pack = [];
-  for (const band of bands) {
-    // preferenza alle carte più giocate: si pesca fra le prime 25 della fascia
-    const top = avail.filter(c => band(c) && !pack.includes(c)).slice(0, 25);
-    if (top.length) pack.push(top[Math.floor(Math.random() * top.length)]);
-  }
-  while (pack.length < 3) {
-    const rest = avail.filter(c => !pack.includes(c));
-    if (!rest.length) break;
-    pack.push(rest[Math.floor(Math.random() * Math.min(rest.length, 40))]);
-  }
-  return pack;
-}
-function viewDraft(v) {
-  const p = el("section", { class: "panel" },
-    ptitle("Draft", `${Math.min(S.draft.length + 1, RULES.draftRounds)}/${RULES.draftRounds}`,
-      "Scegli una creatura fra tre. Le proposte vengono dalle creature del tuo colore più giocate del periodo: quando possibile, una economica (fino a 2 mana), una media (3-4) e una costosa (5 o più). Se nessuna ti piace, chiedine altre tre."));
-  const status = el("div", { class: "status" }, "Carico le carte da Scryfall…");
-  p.append(status);
-  const area = el("div", { class: "pack" });
-  p.append(area);
-  const nav = el("div", { class: "row", style: "margin-top:18px" },
-    el("button", { class: "btn ghost", onclick: () => go(1) }, "Indietro"),
-    el("button", { class: "btn ghost", disabled: !S.draft.length, onclick: () => {
-      S.draft.pop(); S.draftPack = null; save(); render(); } }, "Annulla l'ultima scelta"),
-    el("button", { class: "btn", disabled: S.draft.length < RULES.draftRounds, onclick: () => go(3) }, "Avanti: bombe"));
-  v.append(p);
-  if (S.draft.length) {
-    const done = el("div", { class: "cards" });
-    for (const c of S.draft) { const n = el("div", { class: "card", style: "cursor:default" }, cardImg(c)); n.append(...cardControls(c, n)); hoverPreview(n, c); done.append(n); }
-    v.append(el("section", { class: "panel" }, ptitle("Già scelte nel draft", S.draft.length), done));
-  }
-  p.append(nav);
-  if (S.draft.length >= RULES.draftRounds) { status.textContent = "Draft completato."; return; }
-  loadPool().then(() => {
-    if (!S.draftPack || !S.draftPack.length) { S.draftPack = makePack(); save(); }
-    status.textContent = "";
-    if (!S.draftPack.length) { status.textContent = "Non ci sono più creature da proporre."; return; }
-    for (const c of S.draftPack) {
-      const n = el("button", { class: "card", title: c.name, onclick: () => {
-        S.draftShown.push(...S.draftPack.filter(x => x.name !== c.name).map(x => x.name));
-        S.draft.push(c); S.draftPack = null; save(); render();
-      } }, cardImg(c));
-      hoverPreview(n, c); area.append(n);
-    }
-    area.after(el("div", { class: "row", style: "justify-content:center;margin-top:12px" },
-      el("button", { class: "btn ghost", onclick: () => {
-        S.draftShown.push(...S.draftPack.map(x => x.name)); S.draftPack = null; save(); render();
-      } }, "Nessuna mi piace: altre tre")));
-  }).catch(e => { status.textContent = "Errore nel caricare le carte: " + e.message; });
-}
-
-// ---------------------------------------------------------------- STEP 4: bombe
-function viewBombs(v) {
-  const p = el("section", { class: "panel" },
-    ptitle("Bombe", `${S.bombs.length}/${RULES.maxBombs}`,
-      "Carte uscite dopo Liberatori di Kamigawa, del tuo colore o incolori, in copia singola. Sono facoltative. Le bombe già valutate hanno i loro punti (2, 1 o 0); quelle non ancora in lista costano almeno 1 punto se sono mitiche o dei set Modern Horizons, e le valuta Fede."));
-  const grid = el("div", { class: "slots" });
-  for (let i = 0; i < RULES.maxBombs; i++) {
-    const c = S.bombs[i];
-    if (c) {
-      const pt = points(c);
-      const s = filledSlot(c, () => { S.bombs.splice(i, 1); save(); render(); });
-      if (pt.p) s.append(el("span", { class: "tag" }, el("b", {}, `${pt.p} punt${pt.p === 1 ? "o" : "i"}`)));
-      grid.append(s);
-    } else {
-      grid.append(el("button", { class: "slot", title: "Aggiungi bomba", onclick: () => openSearch({
-        title: "Scegli una bomba", filters: `id<=${S.color.toLowerCase()}`, bombOnly: true,
-        onPick: c => { S.bombs.push(c); save(); render(); return true; }
-      }) }, "+"));
-    }
-  }
-  p.append(grid);
-  p.append(el("div", { class: "row", style: "margin-top:18px" },
-    el("button", { class: "btn ghost", onclick: () => go(2) }, "Indietro"),
-    el("button", { class: "btn", onclick: () => go(4) }, "Avanti: il mazzo")));
-  v.append(p);
-}
-
-// ---------------------------------------------------------------- STEP 5: mazzo
+// ---------------------------------------------------------------- PASSO 3: mazzo
 async function ensureLands() {
   if (S.lands.length) return;
   const basic = COLORS[S.color].basic;
@@ -665,20 +680,25 @@ async function ensureLands() {
   save();
   try {
     const r = await search(`!"${basic}" prefer:oldest`);
-    if (r.data[0]) { S.lands[0] = { ...toCard(r.data[0]), qty: S.lands[0].qty }; save(); if (S.step === 4) render(); }
+    if (r.data[0]) { S.lands[0] = { ...toCard(r.data[0]), qty: S.lands[0].qty }; save(); if (S.step === 2) render(); }
   } catch (e) {}
 }
-function listFor(src) {
-  return { scelta: S.picked, draft: S.draft, bomba: S.bombs, aggiunta: S.extra, terra: S.lands }[src];
-}
-function changeQty(c, delta) {
-  const list = listFor(c.src);
-  const item = list.find(x => x.name === c.name);
-  if (!item) return;
-  const q = (item.qty || 1) + delta;
-  if (q <= 0) list.splice(list.indexOf(item), 1);
-  else if (q <= maxCopies(item)) item.qty = q;
+function changeLand(name, delta) {
+  const l = S.lands.find(x => x.name === name); if (!l) return;
+  l.qty += delta;
+  if (l.qty <= 0) S.lands.splice(S.lands.indexOf(l), 1);
   save(); render();
+}
+function deckSearchOpts() {
+  return { title: "Aggiungi una carta", filters: `id<=${S.color.toLowerCase()}`, keepOpen: true, onPick: c => addCard(c) && (render(), true) };
+}
+function groupsOf(cards) {
+  return [
+    ["Creature", cards.filter(c => c.creature && !c.bomb && c.src !== "comandante")],
+    ["Bombe", cards.filter(c => c.bomb)],
+    ["Altre carte", cards.filter(c => !c.creature && !c.bomb && !c.land)],
+    ["Terre", cards.filter(c => c.land && !c.bomb)],
+  ];
 }
 function viewDeck(v) {
   const cards = allCards();
@@ -686,41 +706,90 @@ function viewDeck(v) {
   const lands = cards.filter(c => c.land).reduce((a, c) => a + c.qty, 0);
   const creatures = cards.filter(c => c.creature).reduce((a, c) => a + c.qty, 0);
   const pts = cards.reduce((a, c) => a + points(c).p * c.qty, 0);
+  const missing = Math.max(0, RULES.deckSize - tot);
 
   const p = el("section", { class: "panel" },
     ptitle(`Il mazzo di ${S.player || "…"}`, COLORS[S.color].name,
-      "Qui completi e modifichi tutto: aggiungi magie, artefatti e terre non base, cambi le copie, togli carte. Per mettere una terra non base, togli una terra base con il −. Le creature restano sempre in copia singola, le altre carte al massimo 2."));
+      "Aggiungi le carte con il + o con «Aggiungi carta»: ogni carta una volta sola, tranne le terre base. Per mettere una terra non base, togli una terra base con il −. Se vuoi una mano, accendi la modalità draft: ti propone tre carte alla volta finché il mazzo non è pieno."));
   p.append(el("div", { class: "summary" },
-    stat(`${tot}/${RULES.deckSize}`, "carte", tot >= RULES.deckSize ? "ok" : "warn"),
+    stat(`${tot}/${RULES.deckSize}`, "carte, comandante compreso", tot >= RULES.deckSize ? "ok" : "warn"),
     stat(creatures, "creature"), stat(lands, "terre"),
     stat(`${bombs}/${RULES.maxBombs}`, "bombe", bombs > RULES.maxBombs ? "bad" : ""),
     stat(`${pts}/${RULES.budget}`, "punti", pts > RULES.budget ? "bad" : "")));
-  p.append(el("div", { class: "row", style: "margin-bottom:12px" },
-    el("button", { class: "btn", onclick: () => openSearch({
-      title: "Aggiungi una carta", filters: `id<=${S.color.toLowerCase()}`,
-      onPick: c => {
-        const ex = S.extra.find(x => x.name === c.name);
-        if (ex) { if (ex.qty >= maxCopies(ex)) return false; ex.qty++; }
-        else S.extra.push({ ...c, qty: 1 });
-        save(); render(); return true;
-      }, keepOpen: true }) }, "+ Aggiungi carta"),
-    el("button", { class: "btn ghost", onclick: () => exportTxt() }, "Esporta lista (.txt)"),
-    el("button", { class: "btn ghost", onclick: () => exportJson() }, "Esporta per Fede (.json)"),
-    el("button", { class: "btn ghost", onclick: () => copyList() }, "Copia lista"),
-    importButton(),
-    el("button", { class: "btn danger", onclick: () => {
-      if (confirm("Ricominciare da capo? Il mazzo attuale verrà cancellato da questo browser.")) { S = freshState(); save(); render(); }
-    } }, "Ricomincia")));
-
-  const groups = [
-    ["Creature", cards.filter(c => c.creature && !c.bomb)],
-    ["Bombe", cards.filter(c => c.bomb)],
-    ["Altre carte", cards.filter(c => !c.creature && !c.bomb && !c.land)],
-    ["Terre", cards.filter(c => c.land && !c.bomb)],
-  ];
+  // comandante in evidenza
+  if (S.commander) {
+    const c = S.commander, why = commanderProblem(c);
+    const strip = el("div", { class: "cmdbar" }, cardImg(c),
+      el("div", {}, el("span", { class: "eyebrow" }, "Comandante"),
+        el("b", {}, c.it || c.name), why ? el("span", { class: "bad" }, " ✗ " + why) : null,
+        el("div", { class: "row", style: "margin-top:6px" },
+          el("button", { class: "icon", onclick: () => go(1) }, "Cambia"),
+          el("button", { class: "icon", onclick: () => openPrints(c) }, "🖼 Immagine"))));
+    hoverPreview(strip, c);
+    p.append(strip);
+  }
+  p.append(el("div", { class: "row", style: "margin:12px 0" },
+    el("button", { class: "btn", onclick: () => openSearch(deckSearchOpts()) }, "+ Aggiungi carta"),
+    el("button", { class: "btn ghost draftbtn" + (S.draftOn ? " on" : ""), "aria-pressed": S.draftOn ? "true" : "false",
+      onclick: () => { S.draftOn = !S.draftOn; S.draftPack = null; save(); render(); } }, S.draftOn ? "🎲 Esci dalla modalità draft" : "🎲 Modalità draft"),
+    el("span", { class: "seg" },
+      el("button", { "aria-pressed": S.view !== "lista" ? "true" : "false", onclick: () => { S.view = "carte"; save(); render(); } }, "Carte"),
+      el("button", { "aria-pressed": S.view === "lista" ? "true" : "false", onclick: () => { S.view = "lista"; save(); render(); } }, "Lista")),
+    el("span", { class: "muted" }, missing ? `Mancano ${missing} carte` : "Mazzo completo")));
+  v.append(p);
+  if (S.draftOn) v.append(draftPanel(missing));
+  v.append(S.view === "lista" ? listPanel(cards) : cardsPanel(cards));
+  v.append(checksPanel(cards, tot, bombs, pts));
+  v.append(el("section", { class: "panel" }, ptitle("Salva e condividi", null, "Il mazzo resta salvato solo in questo browser. Per mandarlo a Fede usa «Esporta per Fede»; con «Importa .json» lo riprendi su un altro computer."),
+    el("div", { class: "row" },
+      el("button", { class: "btn ghost", onclick: () => exportTxt() }, "Esporta lista (.txt)"),
+      el("button", { class: "btn", onclick: () => exportJson() }, "Esporta per Fede (.json)"),
+      el("button", { class: "btn ghost", onclick: () => copyList() }, "Copia lista"),
+      importButton(),
+      el("button", { class: "btn danger", onclick: () => {
+        if (confirm("Ricominciare da capo? Il mazzo attuale verrà cancellato da questo browser.")) { S = freshState(); save(); render(); }
+      } }, "Ricomincia"))));
+}
+function cardsPanel(cards) {
+  const p = el("section", { class: "panel" });
+  for (const [label, list] of groupsOf(cards)) {
+    const items = list.filter(c => !c.basic);
+    if (label !== "Creature" && !items.length) continue;
+    items.sort((a, b) => a.cmc - b.cmc || a.name.localeCompare(b.name));
+    p.append(el("h4", { class: "grp" }, `${label} (${items.length})`));
+    const grid = el("div", { class: "slots" });
+    for (const c of items) {
+      const s = filledSlot(c, () => removeCard(c.name));
+      if (c.qty > 1) s.append(el("span", { class: "ptb", style: { top: "auto", bottom: "34px", background: "var(--bad)", color: "#fff" } }, `${c.qty} copie: max 1`));
+      grid.append(s);
+    }
+    if (label === "Creature") grid.append(el("button", { class: "slot", title: "Aggiungi carta", onclick: () => openSearch(deckSearchOpts()) }, "+"));
+    p.append(grid);
+  }
+  // terre base: una riga compatta con − e +
+  const basics = S.lands.filter(l => l.basic);
+  if (basics.length) {
+    p.append(el("h4", { class: "grp" }, "Terre base"));
+    const row = el("div", { class: "landrow" });
+    for (const l of basics) {
+      const chip = el("div", { class: "landchip" }, cardImg(l),
+        el("div", {}, el("b", {}, `${l.qty}× ${l.name}`),
+          el("div", { class: "row" },
+            el("button", { class: "mini", title: "Togli una terra base", onclick: () => changeLand(l.name, -1) }, "−"),
+            el("button", { class: "mini", title: "Aggiungi una terra base", onclick: () => changeLand(l.name, +1) }, "+"),
+            el("button", { class: "icon", onclick: () => openPrints({ ...l, src: "terra" }) }, "🖼"))));
+      hoverPreview(chip, l); row.append(chip);
+    }
+    p.append(row);
+  }
+  return p;
+}
+function listPanel(cards) {
+  const p = el("section", { class: "panel" });
   const table = el("table", { class: "list" },
     el("thead", {}, el("tr", {}, el("th", {}, "Copie"), el("th", {}, "Carta"), el("th", { class: "type" }, "Tipo"), el("th", {}, "Mana"), el("th", {}, "Note"), el("th", {}, ""))));
   const tb = el("tbody");
+  const groups = [["Comandante", cards.filter(c => c.src === "comandante")], ...groupsOf(cards)];
   for (const [label, list] of groups) {
     if (!list.length) continue;
     const n = list.reduce((a, c) => a + c.qty, 0);
@@ -729,8 +798,6 @@ function viewDeck(v) {
     for (const c of list) {
       const pt = points(c), prob = problems(c);
       const notes = [];
-      if (c.src === "scelta") notes.push(el("span", { class: "pill" }, "scelta"));
-      if (c.src === "draft") notes.push(el("span", { class: "pill" }, "draft"));
       if (c.bomb) notes.push(el("span", { class: "pill bomb" }, "bomba"));
       if (pt.p) notes.push(el("span", { class: "pill pts" }, `${pt.p} pt${pt.auto ? " (auto)" : ""}`));
       if (prob.length) notes.push(el("span", { class: "pill bad" }, prob.join(", ")));
@@ -738,22 +805,22 @@ function viewDeck(v) {
       if (c.back) notes.push(el("span", { class: "pill" }, "due facce"));
       const nameCell = el("td", {}, c.uri ? el("a", { href: c.uri, target: "_blank", rel: "noopener" }, c.name) : c.name,
         c.it && c.it !== c.name ? el("span", { class: "it" }, c.it) : null);
-      const row = el("tr", {},
-        el("td", { class: "n" },
-          el("button", { class: "mini", title: "Togli una copia", onclick: () => changeQty(c, -1) }, "−"), " ",
-          el("b", {}, c.qty), " ",
-          el("button", { class: "mini", title: "Aggiungi una copia", disabled: c.qty >= maxCopies(c), onclick: () => changeQty(c, +1) }, "+")),
-        nameCell, el("td", { class: "type" }, c.type), el("td", {}, manaCost(c.mana)), el("td", {}, notes),
+      const qtyCell = c.src === "comandante" ? el("td", { class: "n" }, el("b", {}, "1"))
+        : c.basic ? el("td", { class: "n" },
+            el("button", { class: "mini", title: "Togli una copia", onclick: () => changeLand(c.name, -1) }, "−"), " ",
+            el("b", {}, c.qty), " ",
+            el("button", { class: "mini", title: "Aggiungi una copia", onclick: () => changeLand(c.name, +1) }, "+"))
+        : el("td", { class: "n" }, el("b", { class: c.qty > 1 ? "bad" : "" }, c.qty), " ",
+            el("button", { class: "mini", title: c.qty > 1 ? "Togli una copia" : "Togli dal mazzo", onclick: () => removeCard(c.name) }, c.qty > 1 ? "−" : "×"));
+      const row = el("tr", {}, qtyCell, nameCell, el("td", { class: "type" }, c.type), el("td", {}, manaCost(c.mana)), el("td", {}, notes),
         el("td", {}, el("button", { class: "icon", title: "Cambia immagine (scegli la stampa)", onclick: () => openPrints(c) }, "🖼 Immagine")));
-      hoverPreview(row, c);   // passando sopra la riga: carta ingrandita, con il retro se c'è
+      hoverPreview(row, c);
       tb.append(row);
     }
   }
   table.append(tb);
-  p.append(table);
-  v.append(p);
-  v.append(checksPanel(cards, tot, bombs, pts));
-  v.append(el("div", { class: "row" }, el("button", { class: "btn ghost", onclick: () => go(3) }, "Indietro")));
+  p.append(el("div", { style: "overflow-x:auto" }, table));
+  return p;
 }
 function stat(big, small, cls) {
   return el("div", { class: "stat" }, el("b", { class: cls || "" }, String(big)), el("span", {}, small));
@@ -761,13 +828,16 @@ function stat(big, small, cls) {
 function checksPanel(cards, tot, bombs, pts) {
   const li = (ok, text) => el("li", { class: ok === true ? "ok" : ok === "warn" ? "warn" : "bad" }, (ok === true ? "✓ " : ok === "warn" ? "! " : "✗ ") + text);
   const ul = el("ul", { class: "checks" });
-  ul.append(li(tot >= RULES.deckSize, `Carte: ${tot} (minimo ${RULES.deckSize})`));
+  const cw = commanderProblem(S.commander);
+  ul.append(li(!cw, cw ? "Comandante: " + cw.toLowerCase() : `Comandante: ${S.commander.name}`));
+  if (S.commander && APPROVE_COMMANDERS.includes(front(S.commander.name))) ul.append(li("warn", "Il comandante va presentato al gruppo (8.3)"));
+  ul.append(li(tot >= RULES.deckSize, `Carte: ${tot} (minimo ${RULES.deckSize}, comandante compreso)`));
   ul.append(li(bombs <= RULES.maxBombs, `Bombe: ${bombs} (massimo ${RULES.maxBombs})`));
   const over = cards.filter(c => c.qty > maxCopies(c));
-  ul.append(li(!over.length, over.length ? "Troppe copie: " + over.map(c => c.name).join(", ") : "Copie: creature e bombe singole, altre carte massimo 2"));
+  ul.append(li(!over.length, over.length ? "Più di una copia: " + over.map(c => `${c.qty}× ${c.name}`).join(", ") : "Copia singola per tutte le carte (terre base escluse)"));
   const names = cards.filter(c => !c.basic).map(c => c.name);
   const dup = names.filter((n, i) => names.indexOf(n) !== i);
-  ul.append(li(!dup.length, dup.length ? "Carte ripetute in più sezioni: " + [...new Set(dup)].join(", ") : "Nessuna carta ripetuta"));
+  ul.append(li(!dup.length, dup.length ? "Carte ripetute: " + [...new Set(dup)].join(", ") : "Nessuna carta ripetuta"));
   const bad = cards.filter(c => problems(c).length);
   ul.append(li(!bad.length, bad.length ? "Carte vietate: " + bad.map(c => c.name).join(", ") : "Nessuna carta vietata"));
   const appr = cards.filter(needsApproval);
@@ -779,15 +849,79 @@ function checksPanel(cards, tot, bombs, pts) {
     ptitle("Controlli", null, `Regole dal regolamento v${RULES.version}. Quando hai finito, esporta il .json e mandalo a Fede: controlla i punti e prepara le proxy da stampare.`), ul);
 }
 
+// ---------------------------------------------------------------- DRAFT (facoltativo)
+let pool = null, poolColor = null;
+async function loadPool() {
+  if (pool && poolColor === S.color) return pool;
+  const q = `id<=${S.color.toLowerCase()} -t:land date<=${RULES.cutoff} ${BASE}`;
+  const first = await search(q);
+  let data = first.data;
+  if (first.has_more && first.next_page) {
+    const u = new URL(first.next_page);
+    const second = await sf(u.pathname, Object.fromEntries(u.searchParams));
+    data = data.concat(second.data);
+  }
+  pool = data.map(c => toCard(c)).filter(c => !c.bomb && !problems(c).length);
+  poolColor = S.color;
+  return pool;
+}
+// Tre proposte: una creatura economica, una creatura costosa e una non creatura, fra le più giocate
+function makePack() {
+  const used = new Set(allCards().map(c => c.name).concat(S.draftShown));
+  const avail = pool.filter(c => !used.has(c.name));
+  // le due creature sono del colore del mazzo; la terza carta può essere anche un artefatto incolore
+  const bands = [c => c.creature && c.ci === S.color && c.cmc <= 3, c => c.creature && c.ci === S.color && c.cmc >= 4, c => !c.creature];
+  const pack = [];
+  for (const band of bands) {
+    const top = avail.filter(c => band(c) && !pack.includes(c)).slice(0, 30);
+    if (top.length) pack.push(top[Math.floor(Math.random() * top.length)]);
+  }
+  while (pack.length < 3) {
+    const rest = avail.filter(c => !pack.includes(c));
+    if (!rest.length) break;
+    pack.push(rest[Math.floor(Math.random() * Math.min(rest.length, 40))]);
+  }
+  return pack;
+}
+function draftPanel(missing) {
+  const p = el("section", { class: "panel draftpanel" },
+    ptitle("Modalità draft", missing ? `mancano ${missing} carte` : null,
+      "Scegli una carta fra tre: una creatura economica, una creatura costosa e una non creatura, prese fra le carte classiche più giocate del tuo colore. «Altre tre» salta la proposta. Il draft va avanti finché il mazzo non è pieno; puoi uscire quando vuoi e continuare a mano."));
+  const status = el("div", { class: "status" });
+  const area = el("div", { class: "pack" });
+  p.append(status, area);
+  if (!missing) { status.textContent = "Il mazzo è pieno: il draft è finito."; return p; }
+  status.textContent = "Carico le carte da Scryfall…";
+  loadPool().then(() => {
+    if (!S.draftPack || !S.draftPack.length) { S.draftPack = makePack(); save(); }
+    status.textContent = "";
+    if (!S.draftPack.length) { status.textContent = "Non ci sono più carte da proporre."; return; }
+    for (const c of S.draftPack) {
+      const why = blockReason(c, {});
+      const n = el("button", { class: "card" + (why ? " dis" : ""), title: why ? `${c.name} — ${why}` : c.name, onclick: () => {
+        const w = blockReason(c, {});
+        if (w) { toast(`${c.name}: ${w.toLowerCase()}`, true); return; }
+        S.draftShown.push(...S.draftPack.filter(x => x.name !== c.name).map(x => x.name));
+        addCard(c); S.draftPack = null; save(); render(); toast(`✓ ${c.it || c.name} aggiunta`);
+      } }, cardImg(c), ptBadge(c), el("span", { class: "tag" }, c.name));
+      hoverPreview(n, c); area.append(n);
+    }
+    area.after(el("div", { class: "row", style: "justify-content:center;margin-top:12px" },
+      el("button", { class: "btn ghost", onclick: () => {
+        S.draftShown.push(...S.draftPack.map(x => x.name)); S.draftPack = null; save(); render();
+      } }, "Nessuna mi piace: altre tre"),
+      el("button", { class: "btn ghost", onclick: () => { S.draftOn = false; S.draftPack = null; save(); render(); } }, "Esci dal draft")));
+  }).catch(e => { status.textContent = "Errore nel caricare le carte: " + e.message; });
+  return p;
+}
+
 // ---------------------------------------------------------------- EXPORT / IMPORT
 function deckLines() {
   const cards = allCards();
   const sec = (label, list) => list.length ? [`// ${label} (${list.reduce((a, c) => a + c.qty, 0)})`, ...list.map(c => `${c.qty} ${c.name}`), ""] : [];
   return [`// Formato Bello — mazzo di ${S.player || "?"} — ${COLORS[S.color].name} — ${new Date().toISOString().slice(0, 10)}`, "",
-    ...sec("Creature", cards.filter(c => c.creature && !c.bomb)),
-    ...sec("Bombe", cards.filter(c => c.bomb)),
-    ...sec("Altre carte", cards.filter(c => !c.creature && !c.bomb && !c.land)),
-    ...sec("Terre", cards.filter(c => c.land && !c.bomb))].join("\n");
+    ...sec("Comandante", cards.filter(c => c.src === "comandante")),
+    ...groupsOf(cards).flatMap(([label, list]) => sec(label, list))].join("\n");
 }
 function download(name, text, type) {
   const a = el("a", { href: URL.createObjectURL(new Blob([text], { type })), download: name });
@@ -800,11 +934,11 @@ function exportJson() {
     creature: c.creature, set: c.set, collector_number: c.number, released: c.released,
     rarity: c.rarity, points: points(c).p, scryfall: c.uri }));
   download(fileBase() + ".json", JSON.stringify({ format: "Formato Bello", rules_version: RULES.version,
-    exported_at: new Date().toISOString(), player: S.player, color: S.color, total: total(),
-    cards, state: S }, null, 2), "application/json");
+    exported_at: new Date().toISOString(), player: S.player, color: S.color,
+    commander: S.commander ? S.commander.name : null, total: total(), cards, state: S }, null, 2), "application/json");
 }
 function copyList() {
-  navigator.clipboard.writeText(deckLines()).then(() => alert("Lista copiata negli appunti."), () => alert("Copia non riuscita: usa Esporta lista."));
+  navigator.clipboard.writeText(deckLines()).then(() => toast("Lista copiata negli appunti."), () => toast("Copia non riuscita: usa Esporta lista.", true));
 }
 function importButton() {
   const inp = el("input", { type: "file", accept: ".json,application/json", style: "display:none" });
@@ -813,7 +947,10 @@ function importButton() {
     f.text().then(t => {
       const d = JSON.parse(t);
       if (!d.state || !d.state.color) throw new Error("file non riconosciuto");
-      S = Object.assign(freshState(), d.state); S.step = 4; save(); render();
+      S = migrate(d.state);
+      S.step = S.commander ? 2 : 1;
+      save(); if (S.step === 2) ensureLands(); render(); upgradeBacks();
+      if (!S.commander) toast("Mazzo importato: scegli il comandante, poi passa al mazzo.");
     }).catch(e => alert("Import non riuscito: " + e.message));
   });
   return el("span", {}, inp, el("button", { class: "btn ghost", onclick: () => inp.click() }, "Importa .json"));
@@ -830,7 +967,9 @@ function openSearch(opts) {
   modalOpts = opts; setMode("search");
   $("mTitle").textContent = opts.title;
   $("mQuery").value = ""; $("mResults").textContent = "";
-  $("mStatus").textContent = "Scrivi almeno 3 lettere, in italiano o in inglese.";
+  $("mStatus").textContent = opts.commander
+    ? "Scrivi almeno 3 lettere del nome, in italiano o in inglese."
+    : "Scrivi almeno 3 lettere, in italiano o in inglese: creature, magie, artefatti, terre, classiche o bombe.";
   $("modal").classList.add("on"); $("mQuery").focus();
 }
 // ---- scelta dell'immagine: tutte le stampe della carta
@@ -869,8 +1008,8 @@ async function loadPrints() {
 // Cambia solo l'aspetto (immagine e stampa per le proxy); colore, bomba e punti restano quelli della carta.
 function applyPrint(name, p) {
   const patch = { img: p.img, back: p.back, set: p.set, set_name: p.set_name, number: p.number, uri: p.uri, lang: p.lang, print_released: p.released };
-  for (const list of [S.picked, S.draft, S.bombs, S.extra, S.lands])
-    for (const c of list) if (c.name === name) { if (!c.first_set) c.first_set = c.set; Object.assign(c, patch); }
+  for (const c of [S.commander, ...S.cards, ...S.lands])
+    if (c && c.name === name) { if (!c.first_set) c.first_set = c.set; Object.assign(c, patch); }
   save();
 }
 $("mIt").addEventListener("change", loadPrints);
@@ -885,37 +1024,42 @@ async function runSearch() {
     let data = await searchByName(text, opts.filters, opts.era);
     if (seq !== searchSeq) return;                         // è arrivata una ricerca più recente
     if (opts.classicOnly) data = data.filter(c => !c.bomb);
-    if (opts.bombOnly) data = data.filter(c => c.bomb);
     $("mResults").textContent = "";
-    $("mStatus").textContent = data.length ? `${data.length} carte trovate${data.length > 60 ? " (mostro le prime 60: scrivi di più per restringere)" : ""}.` : "Nessuna carta trovata con questi criteri.";
+    if (!data.length) {
+      // spiegare perché: la carta esiste ma non è adatta qui?
+      const names = await whyNone(text);
+      if (seq !== searchSeq) return;
+      $("mStatus").textContent = !names.length ? "Nessuna carta con questo nome su Scryfall: controlla come è scritto."
+        : opts.commander ? `Trovate ${names.length} carte con questo nome (es. ${names.slice(0, 3).join(", ")}), ma nessuna è una creatura leggendaria classica ${COLORS[S.color].name.toLowerCase()}.`
+        : `Trovate ${names.length} carte con questo nome (es. ${names.slice(0, 3).join(", ")}), ma nessuna è del tuo colore o incolore.`;
+      return;
+    }
+    $("mStatus").textContent = `${data.length} carte trovate${data.length > 60 ? " (mostro le prime 60: scrivi di più per restringere)" : ""}.`;
     for (const c of data.slice(0, 60)) {
       const why = blockReason(c, opts);
-      const pt = points(c);
       const label = c.it && c.it !== c.name ? `${c.it} · ${c.name}` : c.name;
-      const extra = why || [c.bomb ? "Bomba" : "", pt.p ? `${pt.p} pt` : ""].filter(Boolean).join(" · ");
       const badge = el("span", { class: "badge" });
-      const tagExtra = el("b", {}, extra ? " — " + extra : "");
+      const tagExtra = el("b", {}, why ? " — " + why : "");
       const setBadge = () => {
-        const q = qtyInDeck(c.name), max = maxCopies(c);
-        badge.style.display = q ? "" : "none";
-        badge.textContent = c.basic ? `${q} nel mazzo` : `✓ ${q}/${max}`;
-        badge.classList.toggle("full", !c.basic && q >= max);
+        const q = qtyInDeck(c.name);
+        badge.style.display = q && !opts.commander ? "" : "none";
+        badge.textContent = c.basic ? `${q} nel mazzo` : "✓ nel mazzo";
+        badge.classList.toggle("full", !c.basic && q >= 1);
       };
       setBadge();
       const n = el("button", { class: "card" + (why ? " dis" : ""), title: why ? `${label} — ${why}` : label, onclick: () => {
         const block = blockReason(c, opts);
         if (block) { toast(`${c.name}: ${block.toLowerCase()}`, true); return; }
         const ok = opts.onPick(c);
-        if (!ok) { toast(`${c.name}: numero massimo di copie raggiunto`, true); return; }
-        const q = qtyInDeck(c.name), max = maxCopies(c);
-        toast(`✓ ${c.it || c.name} aggiunta` + (c.basic ? ` (${q} nel mazzo)` : ` — ${q}/${max} nel mazzo`));
+        if (!ok) { toast(`${c.name}: è già nel mazzo`, true); return; }
+        toast(opts.commander ? `✓ Comandante: ${c.it || c.name}` : `✓ ${c.it || c.name} aggiunta` + (c.basic ? ` (${qtyInDeck(c.name)} nel mazzo)` : ""));
         if (!opts.keepOpen) { closeSearch(); return; }
         n.classList.remove("added"); void n.offsetWidth; n.classList.add("added");
         setBadge();
         const now = blockReason(c, opts);
         if (now) { n.classList.add("dis"); n.title = `${label} — ${now}`; tagExtra.textContent = " — " + now; }
         $("mStatus").textContent = `Aggiunta: ${c.name}. Puoi aggiungerne altre.`;
-      } }, cardImg(c), badge, el("span", { class: "check" }, "✓"), el("span", { class: "tag" }, label, tagExtra));
+      } }, cardImg(c), ptBadge(c), badge, el("span", { class: "check" }, "✓"), el("span", { class: "tag" }, label, tagExtra));
       hoverPreview(n, c);
       $("mResults").append(n);
     }
@@ -926,22 +1070,22 @@ $("mQuery").addEventListener("input", () => { clearTimeout(searchTimer); searchT
 $("mQuery").addEventListener("keydown", e => { if (e.key === "Enter") { clearTimeout(searchTimer); runSearch(); } });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && modalOpts) closeSearch(); });
 
-// Mazzi salvati con la v0.2: recupera il retro delle carte a due facce
+// Mazzi salvati con versioni vecchie: recupera il retro delle carte a due facce
 async function upgradeBacks() {
-  const lists = [S.picked, S.draft, S.bombs, S.extra];
-  const todo = lists.flat().filter(c => c.back === undefined && / \/\/ /.test(c.type) && c.set && c.number);
+  const list = [S.commander, ...S.cards].filter(Boolean);
+  const todo = list.filter(c => c.back === undefined && / \/\/ /.test(c.type) && c.set && c.number);
   for (const c of todo) {
     try {
       const p = await sf(`/cards/${c.set}/${encodeURIComponent(c.number)}`);
       const back = toCard(p).back;
-      for (const l of lists) for (const x of l) if (x.name === c.name) x.back = back;
+      for (const x of list) if (x.name === c.name) x.back = back;
     } catch (e) {}
   }
   if (todo.length) { save(); render(); }
 }
 
 load();
-if (S.step === 4) ensureLands();
+if (S.step === 2) ensureLands();
 render();
 upgradeBacks();
 </script>
