@@ -6,8 +6,8 @@
 <meta name="color-scheme" content="dark">
 <title>Formato Bello — Deck Builder</title>
 <!--
-  Formato Bello — Deck Builder (v0.3, 2026-11-11)
-  Regole e Lista Punti dal regolamento del Formato Bello v0.4: se il
+  Formato Bello — Deck Builder (v0.4, 2026-11-12)
+  Regole e Lista Punti dal regolamento del Formato Bello v0.5: se il
   regolamento cambia, aggiornare la sezione RULES qui sotto.
   Dati, immagini e simboli di mana: API pubblica di Scryfall (serve Internet).
   Non affiliato a Wizards of the Coast né a Scryfall.
@@ -205,16 +205,16 @@ input[type=text]::placeholder { color: #6f8aa5; }
 
 <script>
 "use strict";
-// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.4)
+// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.5)
 const RULES = {
-  version: "0.4",
+  version: "0.5",
   cutoff: "2005-06-03",           // Liberatori di Kamigawa (Saviors of Kamigawa)
   deckSize: 60,
   lands: 23,
   pickedCreatures: 10,
   draftRounds: 10,
   maxBombs: 6,
-  budget: 7,                      // provvisorio, da tarare sul mazzo di Fede
+  budget: 8,                      // regola 4.1 v0.5
   maxNonCreature: 2,
   mhSets: ["mh1", "mh2", "mh3", "h1r"],
 };
@@ -249,9 +249,21 @@ const BANNED = ["Amulet of Quoz", "Ancestral Recall", "Bazaar of Baghdad", "Blac
   "Solitude", "Grief", "Fury", "Endurance", "Subtlety", "Ragavan, Nimble Pilferer",
   "Oko, Thief of Crowns", "Uro, Titan of Road and Sea", "Dockside Extortionist",
   "Hogaak, Arisen Necropolis", "Murktide Regent"];
+// Lista Punti delle bombe (regola 4.4 v0.5): valore esplicito; le bombe non in lista hanno solo il minimo automatico
+const BOMB_POINTS = {
+  2: ["Craterhoof Behemoth", "Hornet Queen", "Avenger of Zendikar", "Wurmcoil Engine", "Questing Beast",
+      "Elder Gargaroth", "Birthing Pod"],
+  1: ["Thrun, Breaker of Silence", "Thrun, the Last Troll", "Carnage Tyrant", "Tarmogoyf", "Thragtusk",
+      "Tireless Tracker", "Polukranos, World Eater", "Master of the Wild Hunt", "Vengevine", "Primeval Titan",
+      "Vorinclex // The Grand Evolution", "Kalonian Hydra", "Rampaging Baloths", "Lotus Cobra", "Old Gnawbone",
+      "Terastodon", "Ghalta, Primal Hunger", "Hexhaven Invigorator", "Voracious Hydra", "Ancient Greenwarden"],
+  0: ["Beast Within", "Acidic Slime", "Obstinate Baloth", "Heroic Intervention", "Courser of Kruphix",
+      "Scavenging Ooze", "Pelakka Wurm", "Wolfir Silverheart", "Territorial Allosaurus", "Vigor", "Hardened Scales"],
+};
 const BANNED_SET = new Set(BANNED.map(n => n.toLowerCase()));
 const POINTS_MAP = new Map();
-for (const [p, names] of Object.entries(POINTS)) for (const n of names) POINTS_MAP.set(n.toLowerCase(), +p);
+for (const list of [POINTS, BOMB_POINTS])
+  for (const [p, names] of Object.entries(list)) for (const n of names) POINTS_MAP.set(n.toLowerCase(), +p);
 const SYMBOL_URL = s => `https://svgs.scryfall.io/card-symbols/${s.replace(/\//g, "")}.svg`;
 
 // ---------------------------------------------------------------- STATE
@@ -353,11 +365,14 @@ function maxCopies(c) {
   return RULES.maxNonCreature;
 }
 function points(c) {
-  let p = POINTS_MAP.get(c.name.toLowerCase()) || 0;
+  const key = c.name.toLowerCase();
+  const listed = POINTS_MAP.has(key);
+  let p = listed ? POINTS_MAP.get(key) : 0;
   let auto = false;
-  // la stampa scelta per l'immagine non cambia i punti: contano rarità e set della prima stampa
-  if (c.bomb && (c.rarity === "mythic" || RULES.mhSets.includes(c.first_set || c.set)) && p < 1) { p = 1; auto = true; }
-  return { p, auto };
+  // minimo automatico solo per le bombe non in lista; la stampa scelta per l'immagine
+  // non cambia i punti: contano rarità e set della prima stampa
+  if (!listed && c.bomb && (c.rarity === "mythic" || RULES.mhSets.includes(c.first_set || c.set)) && p < 1) { p = 1; auto = true; }
+  return { p, auto, listed };
 }
 function problems(c) {
   const out = [];
@@ -618,7 +633,7 @@ function viewDraft(v) {
 function viewBombs(v) {
   const p = el("section", { class: "panel" },
     ptitle("Bombe", `${S.bombs.length}/${RULES.maxBombs}`,
-      "Carte uscite dopo Liberatori di Kamigawa, del tuo colore o incolori, in copia singola. Sono facoltative. Le mitiche e le carte dei set Modern Horizons costano almeno 1 punto; le altre bombe le valuta Fede."));
+      "Carte uscite dopo Liberatori di Kamigawa, del tuo colore o incolori, in copia singola. Sono facoltative. Le bombe già valutate hanno i loro punti (2, 1 o 0); quelle non ancora in lista costano almeno 1 punto se sono mitiche o dei set Modern Horizons, e le valuta Fede."));
   const grid = el("div", { class: "slots" });
   for (let i = 0; i < RULES.maxBombs; i++) {
     const c = S.bombs[i];
@@ -679,7 +694,7 @@ function viewDeck(v) {
     stat(`${tot}/${RULES.deckSize}`, "carte", tot >= RULES.deckSize ? "ok" : "warn"),
     stat(creatures, "creature"), stat(lands, "terre"),
     stat(`${bombs}/${RULES.maxBombs}`, "bombe", bombs > RULES.maxBombs ? "bad" : ""),
-    stat(`${pts}/${RULES.budget}`, "punti (provvisori)", pts > RULES.budget ? "warn" : "")));
+    stat(`${pts}/${RULES.budget}`, "punti", pts > RULES.budget ? "bad" : "")));
   p.append(el("div", { class: "row", style: "margin-bottom:12px" },
     el("button", { class: "btn", onclick: () => openSearch({
       title: "Aggiungi una carta", filters: `id<=${S.color.toLowerCase()}`,
@@ -757,9 +772,9 @@ function checksPanel(cards, tot, bombs, pts) {
   ul.append(li(!bad.length, bad.length ? "Carte vietate: " + bad.map(c => c.name).join(", ") : "Nessuna carta vietata"));
   const appr = cards.filter(needsApproval);
   if (appr.length) ul.append(li("warn", "Protezioni da far approvare al gruppo: " + appr.map(c => c.name).join(", ")));
-  ul.append(li(pts <= RULES.budget ? true : "warn", `Punti: ${pts} su ${RULES.budget} (budget provvisorio)`));
-  const unrated = cards.filter(c => c.bomb && !points(c).p);
-  if (unrated.length) ul.append(li("warn", "Bombe senza punti in lista, da valutare con Fede: " + unrated.map(c => c.name).join(", ")));
+  ul.append(li(pts <= RULES.budget, `Punti: ${pts} su ${RULES.budget}`));
+  const unrated = cards.filter(c => c.bomb && !points(c).listed);
+  if (unrated.length) ul.append(li("warn", "Bombe non ancora nella Lista Punti, da valutare con Fede: " + unrated.map(c => c.name).join(", ")));
   return el("section", { class: "panel" },
     ptitle("Controlli", null, `Regole dal regolamento v${RULES.version}. Quando hai finito, esporta il .json e mandalo a Fede: controlla i punti e prepara le proxy da stampare.`), ul);
 }
