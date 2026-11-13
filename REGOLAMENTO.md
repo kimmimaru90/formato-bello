@@ -1,6 +1,7 @@
 # Formato Bello — Regolamento
 
-**Versione 0.8 — 2026-11-12.** Contiene le decisioni di Fede sui punti aperti
+**Versione 0.9 — 2026-11-13.** Rimossa la regola dell’identità di colore.
+Contiene le decisioni di Fede sui punti aperti
 dalla v0.1 in poi; la v0.6 ha introdotto il comandante (sezione 8) e la copia
 singola per tutte le carte, la v0.7 ha fissato i comandanti vietati e tolto il
 danno da comandante, la v0.8 ammette come comandante anche le creature non
@@ -33,10 +34,11 @@ conservate in fondo, nella sezione storica.
   comandante più 36 slot per il resto). Si può sostituire una terra base con
   una terra non base, per esempio una Foresta con Gaea's Cradle.
   **[DA DECIDERE]** se 23 terre è una regola fissa o solo il punto di partenza.
-- **1.3 Mono colore (punto di partenza):** ogni mazzo usa **un solo colore**,
-  più carte incolori (artefatti e terre). È vietata una carta che nel costo o
-  nel testo ha simboli di mana di un altro colore. Si parte così; il gruppo
-  può cambiare la regola in futuro.
+- **1.3 Mono colore:** sono ammesse le carte del **colore scelto** e le
+  carte **incolori**. I simboli di mana di altri colori nel testo, per
+  esempio in un costo di kicker o di attivazione, sono ammessi. Si
+  applicano le normali regole di Magic per determinare il colore effettivo
+  della carta e per pagare i costi.
 - **1.4 Un colore a testa:** ogni giocatore ha un colore suo. Si sceglie
   d'accordo; se due vogliono lo stesso colore, si tira a sorte.
 
@@ -176,9 +178,8 @@ Proposto dagli amici di Fede al primo confronto. Si usano le meccaniche di
 Commander, adattate a un mazzo da 60 carte.
 
 - **8.1 Chi può esserlo:** una **creatura classica**, leggendaria o no
-  (regola 2.1, quindi mai una bomba), del **colore del mazzo**: la sua
-  identità di colore è esattamente quel colore. Il comandante fa parte delle
-  60 carte.
+  (regola 2.1, quindi mai una bomba), del **colore effettivo del mazzo**
+  secondo la regola 1.3. Il comandante fa parte delle 60 carte.
 - **8.2 Zona di comando:** a inizio partita il comandante è nella zona di
   comando e da lì si può lanciare. Ogni volta che lo lanci dalla zona di
   comando costa **{2} in più per ogni volta che l'hai già lanciato da lì**
@@ -290,6 +291,17 @@ Commander, adattate a un mazzo da 60 carte.
 
 ## Sezione storica
 
+### Regole della v0.8 superate dalla v0.9
+
+- *1.3 v0.8 — Mono colore (punto di partenza):* un solo colore più carte
+  incolori. Era vietata una carta che nel costo o nel testo avesse simboli
+  di mana di un altro colore. Si partiva così e il gruppo poteva rivedere
+  la regola.
+- *8.1 v0.8 — Il comandante doveva avere identità di colore esattamente
+  uguale al colore del mazzo.*
+- La v0.8 considerava le dieci terre doppie originali inutilizzabili per
+  il vincolo mono colore.
+
 ### Regole della v0.7 superate dalla v0.8
 
 - *8.1 v0.7 — Il comandante è una creatura leggendaria classica:* ora basta
@@ -356,8 +368,9 @@ Mine, Survival of the Fittest, Fossato, Armageddon, Show and Tell, Crogiolo
 dei Mondi, Bayou, Steppa, Savana, Malaterra, Isola Vulcanica, Isola Tropicale,
 Mare Sotterraneo, Tundra, Altopiano, Taiga.
 
-*Note:* le dieci terre doppie sono inutilizzabili con il mono colore (1.3). Il
-Tutore Mistico compariva sia fra le limitate sia fra le bandite: resta bandito.
+*Note:* le dieci terre doppie originali sono carte incolori e sono
+ammesse dalla v0.9. Il Tutore Mistico compariva sia fra le limitate sia
+fra le bandite: resta bandito.
 
 **Bandite:** Amulet of Quoz, Ancestral Recall, Bazaar of Baghdad, Black Lotus,
 Bronze Tablet, Channel, Chaos Orb, Contact From Below, Darkpact, Deathrite

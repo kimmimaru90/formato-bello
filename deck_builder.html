@@ -7,7 +7,7 @@
 <title>Formato Bello — Deck Builder</title>
 <!--
   Formato Bello — Deck Builder (v0.5, 2026-11-12)
-  Regole e Lista Punti dal regolamento del Formato Bello v0.8: se il
+  Regole e Lista Punti dal regolamento del Formato Bello v0.9: se il
   regolamento cambia, aggiornare la sezione RULES qui sotto.
   Dati, immagini e simboli di mana: API pubblica di Scryfall (serve Internet).
   Non affiliato a Wizards of the Coast né a Scryfall.
@@ -228,9 +228,9 @@ h4.grp { margin: 14px 0 8px; font-size: 13px; text-transform: uppercase; letter-
 
 <script>
 "use strict";
-// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.8)
+// ---------------------------------------------------------------- RULES (da REGOLAMENTO.md v0.9)
 const RULES = {
-  version: "0.8",
+  version: "0.9",
   cutoff: "2005-06-03",           // Liberatori di Kamigawa (Saviors of Kamigawa)
   deckSize: 60,                   // comandante compreso (1.1)
   lands: 23,                      // punto di partenza (1.5)
@@ -356,6 +356,7 @@ function toCard(c, itName) {
     mana: c.mana_cost || (face && face.mana_cost) || "", rarity: c.rarity,
     set: c.set, first_set: c.set, set_name: c.set_name, number: c.collector_number, released: c.released_at,
     lang: c.lang || "en", ci: (c.color_identity || []).join(""),
+    colors: (c.colors || (face && face.colors) || []).join(""),
     img, back, uri: c.scryfall_uri, oracle, set_type: c.set_type,
     creature: /\bCreature\b/.test(type), land: /\bLand\b/.test(type),
     basic: /\bBasic\b/.test(type) && /\bLand\b/.test(type),
@@ -443,7 +444,7 @@ function commanderProblem(c) {
   if (!c) return "Manca il comandante";
   if (!c.creature) return "Non è una creatura";   // 8.1 v0.8: anche non leggendaria
   if (c.bomb) return "Uscito dopo Liberatori di Kamigawa: il comandante deve essere classico";
-  if (c.ci && c.ci !== S.color) return "Non è del colore del mazzo";
+  if (c.colors !== undefined && c.colors !== S.color) return "Non è del colore del mazzo";
   if (BANNED_COMMANDERS.includes(front(c.name))) return "Vietato come comandante (8.3)";
   const p = problems(c);
   if (p.length) return "Vietato: " + p.join(", ");
@@ -594,7 +595,7 @@ function render() {
 // ---------------------------------------------------------------- PASSO 1: colore
 function viewColor(v) {
   const p = el("section", { class: "panel" },
-    ptitle("Chi sei e che colore giochi?", null, "Il mazzo è mono colore: tutte le carte devono essere del colore scelto, più eventuali carte incolori (artefatti e terre). Ogni giocatore ha un colore suo."));
+    ptitle("Chi sei e che colore giochi?", null, "Il mazzo è mono colore: tutte le carte devono essere del colore scelto, più eventuali carte incolori. I simboli di mana di altri colori nel testo sono ammessi. Ogni giocatore ha un colore suo."));
   const name = el("input", { type: "text", value: S.player, placeholder: "Il tuo nome", style: "min-width:240px" });
   name.addEventListener("input", () => { S.player = name.value; save(); });
   p.append(el("div", { class: "row", style: "margin-bottom:16px" }, name));
@@ -620,7 +621,7 @@ function viewColor(v) {
 function commanderSearchOpts() {
   return {
     title: "Scegli il comandante", commander: true,
-    filters: `id=${S.color.toLowerCase()} t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
+    filters: `c=${S.color.toLowerCase()} t:creature`, era: `date<=${RULES.cutoff}`, classicOnly: true,
     onPick: c => { S.commander = c; save(); render(); return true; },
   };
 }
@@ -669,7 +670,7 @@ function viewCommander(v) {
     }
   };
   if (cmdSuggest && cmdSuggestColor === S.color) fill();
-  else search(`id=${S.color.toLowerCase()} t:creature date<=${RULES.cutoff} ${BASE}`).then(r => {
+  else search(`c=${S.color.toLowerCase()} t:creature date<=${RULES.cutoff} ${BASE}`).then(r => {
     cmdSuggest = r.data.map(c => toCard(c)).filter(c => !commanderProblem(c)); cmdSuggestColor = S.color;
     if (S.step === 1) fill();
   }).catch(e => { st.textContent = "Errore nel caricare i suggerimenti: " + e.message; });
@@ -694,7 +695,7 @@ function changeLand(name, delta) {
   save(); render();
 }
 function deckSearchOpts() {
-  return { title: "Aggiungi una carta", filters: `id<=${S.color.toLowerCase()}`, keepOpen: true, onPick: c => addCard(c) && (render(), true) };
+  return { title: "Aggiungi una carta", filters: `c<=${S.color.toLowerCase()}`, keepOpen: true, onPick: c => addCard(c) && (render(), true) };
 }
 function groupsOf(cards) {
   return [
@@ -857,7 +858,7 @@ function checksPanel(cards, tot, bombs, pts) {
 let pool = null, poolColor = null;
 async function loadPool() {
   if (pool && poolColor === S.color) return pool;
-  const q = `id<=${S.color.toLowerCase()} -t:land date<=${RULES.cutoff} ${BASE}`;
+  const q = `c<=${S.color.toLowerCase()} -t:land date<=${RULES.cutoff} ${BASE}`;
   const first = await search(q);
   let data = first.data;
   if (first.has_more && first.next_page) {
@@ -874,7 +875,7 @@ function makePack() {
   const used = new Set(allCards().map(c => c.name).concat(S.draftShown));
   const avail = pool.filter(c => !used.has(c.name));
   // le due creature sono del colore del mazzo; la terza carta può essere anche un artefatto incolore
-  const bands = [c => c.creature && c.ci === S.color && c.cmc <= 3, c => c.creature && c.ci === S.color && c.cmc >= 4, c => !c.creature];
+  const bands = [c => c.creature && c.colors === S.color && c.cmc <= 3, c => c.creature && c.colors === S.color && c.cmc >= 4, c => !c.creature];
   const pack = [];
   for (const band of bands) {
     const top = avail.filter(c => band(c) && !pack.includes(c)).slice(0, 30);

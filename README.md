@@ -14,7 +14,8 @@ comandante e qualche carta moderna in dosi controllate.
 - **Carte classiche:** quelle con almeno una stampa uscita entro
   *Liberatori di Kamigawa* (giugno 2005).
 - **Mono colore:** un solo colore per mazzo, più carte incolori. Ogni
-  giocatore ha il suo colore.
+  giocatore ha il suo colore. I simboli di mana di altri colori nel testo delle
+  carte sono ammessi, anche per il comandante.
 - **Comandante:** una creatura classica del tuo colore, leggendaria o no. Parte
   dalla zona di comando, da lì si lancia, e ogni volta che la rilanci costa
   {2} in più; se va nel cimitero o in esilio torna nella zona di comando.
